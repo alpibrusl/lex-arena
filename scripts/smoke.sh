@@ -49,6 +49,35 @@ check_dashboard "games_lobby.html" "Lex Arena" "lobby: games_lobby.html serves a
 check_dashboard "ttt_web.html"     "tic-tac-toe" "game: tic-tac-toe (ttt_web.html) serves and is healthy"
 check_dashboard "bazaar_web.html"  "Bazaar" "bazaar: bazaar_web.html serves and is healthy"
 
+# The React SPA (lobby + tic-tac-toe pilot, lex-robot#87): built by CI into
+# examples-dist/ before this script runs. LEX_ARENA_SPA_DIR opts the play host
+# into serving it instead of the legacy dashboard at / and /play/:game.
+echo "== React SPA (lobby + tic-tac-toe pilot) =="
+if [ -f "$ROOT/examples-dist/index.html" ]; then
+  pkill -f "sim_sidecar.lex" >/dev/null 2>&1 || true
+  sleep 0.5
+  rm -f "/tmp/lex-sidecar-${PORT}.db"*
+  LEX_ROBOT_REPO_ROOT="$ROOT" LEX_ARENA_SPA_DIR="examples-dist" LEX_ROBOT_SIDECAR_PORT="$PORT" \
+    lex run --allow-effects "$EFF" "$SIDECAR" run >/tmp/lex-arena-spa-smoke.log 2>&1 &
+  disown
+  ok=0
+  for _ in $(seq 1 50); do
+    curl -sf "http://127.0.0.1:${PORT}/health" >/dev/null 2>&1 && { ok=1; break; }
+    sleep 0.2
+  done
+  root_html="$(curl -sf "http://127.0.0.1:${PORT}/" 2>/dev/null)"
+  play_html="$(curl -sf "http://127.0.0.1:${PORT}/play/ttt" 2>/dev/null)"
+  asset_path="$(grep -oE '/assets/[A-Za-z0-9_.-]+\.js' "$ROOT/examples-dist/index.html" | head -1)"
+  asset_status="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:${PORT}${asset_path}" 2>/dev/null)"
+  if [ "$ok" -eq 1 ] && grep -qF "Lex Arena" <<<"$root_html"; then pass "SPA: / serves the built index.html"; else bad "SPA: / did not serve the built SPA"; fi
+  if grep -qF "Lex Arena" <<<"$play_html"; then pass "SPA: /play/ttt (client route) falls back to index.html"; else bad "SPA: /play/ttt did not serve the SPA shell"; fi
+  if [ "$asset_status" = "200" ]; then pass "SPA: hashed JS bundle serves from /assets/"; else bad "SPA: JS bundle asset returned $asset_status"; fi
+  lsof -ti ":${PORT}" 2>/dev/null | xargs -r kill -9 2>/dev/null || true
+  sleep 0.5
+else
+  bad "SPA: examples-dist/ not built — run 'npm run build' in web/ first"
+fi
+
 echo
 if [ "$fail" -eq 0 ]; then echo "ALL GREEN"; else echo "FAILURES ABOVE"; fi
 exit "$fail"

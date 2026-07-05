@@ -3,6 +3,19 @@
 # the referee-only manifest, warm the dep cache, then run sim_sidecar as the
 # dashboard/referee. Remote player agents connect over A2A and play; every move
 # is recorded to the hash-chained trail.
+#
+# The lobby + one pilot game (tic-tac-toe) are a React SPA (web/) built here and
+# served by the SAME sim_sidecar.lex at the same origin — no separate frontend
+# host, no CORS (lex-robot#87). The remaining games are still the legacy static
+# dashboards under examples/, served unchanged.
+
+FROM node:22-slim AS web-build
+WORKDIR /web
+COPY web/package.json web/package-lock.json ./
+RUN npm ci
+COPY web/ ./
+RUN npm run build
+
 FROM ubuntu:24.04
 
 ARG LEX_VERSION=0.10.0
@@ -26,6 +39,7 @@ RUN set -e; \
 
 WORKDIR /app
 COPY . .
+COPY --from=web-build /examples-dist ./examples-dist
 
 # Referee-only manifest (drops lex-jobs/lex-guard, which the referee never imports).
 RUN cp deploy/lex.toml lex.toml
@@ -44,7 +58,9 @@ RUN lex check /root/.lex/packages/lex-robot/sidecar/sim_sidecar.lex
 EXPOSE 8900
 ENV LEX_ROBOT_SIDECAR_PORT=8900 \
     LEX_ROBOT_REPO_ROOT=/app \
+    LEX_ARENA_SPA_DIR=examples-dist \
     LEX_DASHBOARD_HTML=games_lobby.html
 
-# The dashboard/referee: serves the web UI + hosts every game's skills + SSE.
+# The dashboard/referee: serves the SPA + the legacy game dashboards + hosts
+# every game's skills + SSE.
 CMD ["sh","-c","lex run --allow-effects concurrent,crypto,env,fs_read,fs_write,io,llm,net,proc,random,sql,time --allow-proc sh /root/.lex/packages/lex-robot/sidecar/sim_sidecar.lex run"]

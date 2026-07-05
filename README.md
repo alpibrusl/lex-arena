@@ -34,14 +34,42 @@ Every demo here runs on the **Lex-native play host**
 each game's or market's skills. Each demo ships a `*_run.sh` launcher and a
 browser client — open `http://localhost:8900` after starting.
 
+## The React SPA (lobby + tic-tac-toe — a pro-UI pilot)
+
+The lobby and one game (tic-tac-toe, the reference game) are also a **React +
+TypeScript + Tailwind** single-page app in `web/` — a from-scratch rewrite
+aimed at a "modern SaaS dashboard" look (Inter + JetBrains Mono, a real
+spacing/shadow scale, one amber accent) rather than the retro-terminal style
+of the plain-HTML dashboards. It talks to the **exact same** `/skill/*` +
+`/events` API the vanilla-JS pages use — no backend changes, no new game
+logic, just a different frontend.
+
+```sh
+cd web && npm install
+npm run dev   # Vite dev server at :5173, proxying /skill,/events,/api to :8900
+              # (start a play host separately: bash examples/ttt_run.sh)
+```
+
+`npm run build` emits to `../examples-dist`, which the play host
+(`sim_sidecar.lex`) serves at the **same origin** as the API when
+`LEX_ARENA_SPA_DIR=examples-dist` is set (lex-robot#87) — no CORS, one deploy.
+`deploy/Dockerfile` builds the SPA in a Node stage and bakes it into the same
+image that runs the referee.
+
+The other five games are still the legacy static dashboards below — the SPA
+rewrite is a pilot, not (yet) a full replacement; see the game grid's `▶ Play`
+links, which route to `/play/ttt` (the SPA) for tic-tac-toe and out to the
+legacy `examples/*_web.html` pages for the rest.
+
 ## Layout
 
 ```
+web/           the React SPA (lobby + tic-tac-toe pilot) — builds to examples-dist/
 examples/      games, bots, web clients, Magentic Bazaar commerce demos
   games.css    shared design system (tokens + header/button/status chrome) for
-               every dashboard; served at GET /games/games.css by the play host
-deploy/        the live referee's Dockerfile + compose + Caddy snippet (play.lexlang.org)
-scripts/       check_readme.sh (docs-in-sync gate), smoke.sh (lobby+game+bazaar, end to end)
+               every legacy dashboard; served at GET /games/games.css by the play host
+deploy/        the live referee's Dockerfile (builds web/ too) + compose + Caddy snippet
+scripts/       check_readme.sh (docs-in-sync gate), smoke.sh (lobby+game+bazaar+SPA, end to end)
 ```
 
 Each dashboard is a self-contained HTML file (no framework, no build step) that

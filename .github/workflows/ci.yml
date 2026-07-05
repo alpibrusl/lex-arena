@@ -26,6 +26,12 @@ jobs:
         with:
           python-version: "3.12"
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
       - name: Install lex toolchain
         run: |
           set -euo pipefail
@@ -50,6 +56,12 @@ jobs:
             lex check "$f" || fail=1
           done
           exit "$fail"
+
+      - name: Build the React SPA (lobby + tic-tac-toe pilot)
+        working-directory: web
+        run: |
+          npm ci
+          npm run build
 
       - name: Smoke (lobby + one game + one bazaar demo, end to end)
         run: bash scripts/smoke.sh
