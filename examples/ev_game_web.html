@@ -4,35 +4,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>lex-games · Charger Duel</title>
-<link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/games/games.css">
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root { --bg:#081410; --bg2:#0d1f18; --bg3:#123026; --border:#1f4a38; --text:#dff2e8; --muted:#7fb09b; --gold:#ffd166; --green:#4ade80; --red:#f87171; --blue:#7fd4ff; }
-html, body { height: 100%; overflow: hidden; }
-body { background: var(--bg); color: var(--text); font-family: 'VT323','Courier New',monospace; font-size: 16px; display: flex; flex-direction: column; height: 100dvh; }
-header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 16px; display: flex; align-items: center; gap: 14px; flex-shrink: 0; height: 42px; }
-header h1 { font-family: '"Press Start 2P"',monospace; font-size: 11px; color: var(--green); letter-spacing: .08em; }
-#h-meta { color: var(--muted); font-size: 14px; flex: 1; }
-#h-dot { width: 9px; height: 9px; border-radius: 50%; background: #1f4a38; } #h-dot.live { background: var(--green); box-shadow: 0 0 8px var(--green); }
-#main { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 16px; }
-#status { font-size: 20px; min-height: 26px; } #status.deny { color: var(--red); } #status.win { color: var(--green); }
-#scores { display: flex; gap: 28px; font-size: 18px; }
-.score { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-.score .who { font-family: '"Press Start 2P"',monospace; font-size: 9px; }
-.score.p1 .who { color: var(--blue); } .score.p2 .who { color: var(--gold); }
-.score.turn { text-shadow: 0 0 10px currentColor; }
-#pool { display: grid; grid-template-columns: repeat(3, 160px); gap: 10px; }
-.chg { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 12px 10px; display: flex; flex-direction: column; gap: 4px; align-items: center; cursor: pointer; transition: transform .1s, border-color .1s; }
+/* Charger Duel's own accent: a green-tinted variant of the shared theme. */
+:root { --bg:#081410; --bg2:#0d1f18; --bg3-solid:#123026; --border:#1f4a38; --text:#dff2e8; --muted:#7fb09b; }
+header h1 { color: var(--green); }
+#h-dot { background: #1f4a38; }
+html, body { overflow: hidden; }
+body { height: 100dvh; }
+#main { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-4); padding: var(--sp-4); }
+#pool { display: grid; grid-template-columns: repeat(3, 160px); gap: var(--sp-3); }
+.chg { background: var(--bg3-solid); border: 1px solid var(--border); border-radius: var(--r-md); padding: var(--sp-3) var(--sp-2); display: flex; flex-direction: column; gap: var(--sp-1); align-items: center; cursor: pointer; transition: transform .15s var(--ease), border-color .15s var(--ease); }
 .chg:hover { border-color: var(--green); transform: translateY(-2px); }
-.chg .ic { font-size: 26px; } .chg .nm { font-size: 18px; }
-.chg .kw { font-size: 15px; color: var(--gold); } .chg .mn { font-size: 14px; color: var(--muted); }
+.chg .ic { font-size: 24px; } .chg .nm { font-size: 15px; }
+.chg .kw { font-size: 13px; color: var(--gold); } .chg .mn { font-size: 12px; color: var(--muted); }
 .chg.P1 { border-color: var(--blue); background: #0c2438; cursor: default; }
 .chg.P2 { border-color: var(--gold); background: #2a2410; cursor: default; }
-.chg .own { font-size: 11px; font-family: '"Press Start 2P"',monospace; }
+.chg .own { font-size: 10px; font-weight: 700; letter-spacing: .04em; }
 .chg.P1 .own { color: var(--blue); } .chg.P2 .own { color: var(--gold); }
-.btn { background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: 'VT323',monospace; font-size: 16px; padding: 6px 14px; border-radius: 5px; cursor: pointer; }
 .btn:hover { border-color: var(--green); color: var(--green); }
-.btn.cheat:hover { border-color: var(--red); color: var(--red); }
 </style>
 </head>
 <body>

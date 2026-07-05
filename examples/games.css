@@ -1,0 +1,146 @@
+/* games.css — shared design system for the lex-arena lobby + every game/dashboard.
+ * Served by the play host at GET /games/games.css (sim_sidecar.lex).
+ *
+ * One typeface (JetBrains Mono), one token set, one component vocabulary
+ * (header chrome, buttons, status line, score row) — a clean technical-console
+ * identity instead of the previous 8-bit-arcade look, still unmistakably
+ * "verifiable systems" (monospace, capability/trail language, dark).
+ *
+ * Each page keeps its own game-specific visuals (board/pool/pitch/role grids)
+ * in its own inline <style> — only what was genuinely duplicated across every
+ * dashboard lives here.
+ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* palette — one step deeper background, clearer panel separation */
+  --bg:      #090f18;
+  --bg2:     #0f1826;
+  --bg3:     #16233470;
+  --bg3-solid: #162334;
+  --border:  #223045;
+  --border-hi: #2e405c;
+  --text:    #e4ecf4;
+  --muted:   #8496ac;
+  --gold:    #f0c169;
+  --green:   #4fd188;
+  --red:     #f26d6d;
+  --blue:    #6fc7ff;
+
+  /* type */
+  --font: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* spacing scale */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-7: 32px;
+
+  /* radius + elevation */
+  --r-sm: 6px; --r-md: 10px; --r-lg: 14px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.24);
+  --shadow-md: 0 6px 20px rgba(0,0,0,.28);
+  --shadow-glow-gold: 0 0 0 1px var(--gold), 0 0 16px -4px rgba(240,193,105,.5);
+
+  --ease: cubic-bezier(.4,0,.2,1);
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code, pre { font-family: var(--font); }
+
+/* ── Header chrome (every dashboard) ── */
+header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 var(--sp-5);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  height: 46px;
+  flex-shrink: 0;
+}
+header h1, #h-brand {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: .04em;
+}
+#h-brand { cursor: pointer; }
+#h-back, #h-help {
+  display: none;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--font);
+  font-size: 13px;
+  padding: 4px 11px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: color .15s var(--ease), border-color .15s var(--ease);
+}
+#h-back:hover { color: var(--text); border-color: var(--border-hi); }
+#h-help:hover { color: var(--gold); border-color: var(--gold); }
+#h-meta { flex: 1; font-size: 13px; color: var(--muted); }
+#h-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #263449;
+  transition: background .2s var(--ease), box-shadow .2s var(--ease);
+}
+#h-dot.live { background: var(--green); box-shadow: 0 0 10px var(--green); }
+
+/* ── Status line ── */
+#status { font-size: 16px; min-height: 22px; color: var(--text); transition: color .15s var(--ease); }
+#status.deny { color: var(--red); }
+#status.win  { color: var(--green); }
+
+/* ── Buttons ── */
+.btn {
+  background: var(--bg3-solid);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  padding: 7px 15px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: border-color .15s var(--ease), color .15s var(--ease), transform .1s var(--ease);
+}
+.btn:hover { border-color: var(--gold); color: var(--gold); }
+.btn:active { transform: translateY(1px); }
+.btn.cheat:hover { border-color: var(--red); color: var(--red); }
+
+/* ── Score row (bazaar / ev-duel / consent-match share this pattern) ── */
+#scores { display: flex; gap: var(--sp-7); font-size: 15px; }
+.score { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.score .who { font-size: 11px; font-weight: 700; letter-spacing: .04em; color: var(--muted); }
+.score.p1 .who { color: var(--blue); }
+.score.p2 .who { color: var(--gold); }
+.score.turn { text-shadow: 0 0 12px currentColor; }
+
+/* ── Panel / sidebar (tic-tac-toe's move-chain, and anything similar) ── */
+#sidebar { width: 300px; flex-shrink: 0; background: var(--border); border-left: 1px solid var(--border); display: flex; flex-direction: column; gap: 1px; overflow: hidden; }
+.panel { background: var(--bg); padding: var(--sp-3) var(--sp-4); display: flex; flex-direction: column; gap: var(--sp-2); overflow: hidden; }
+.panel-title { font-size: 10px; font-weight: 700; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: var(--sp-2); }
+
+/* ── Card (lobby game tiles, how-to box) ── */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: var(--sp-5);
+  box-shadow: var(--shadow-sm);
+  transition: border-color .15s var(--ease), box-shadow .15s var(--ease), transform .15s var(--ease);
+}
+.card:hover { border-color: var(--gold); box-shadow: var(--shadow-glow-gold); transform: translateY(-2px); }

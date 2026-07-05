@@ -4,38 +4,36 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>lex-games · Co-op Infiltration</title>
-<link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/games/games.css">
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root { --bg:#0a0a12; --bg2:#13131f; --bg3:#1c1c2e; --border:#33334a; --text:#e6e6f2; --muted:#8a8aab; --gold:#ffd166; --green:#4ade80; --red:#f87171; --blue:#7fd4ff; --purple:#c08bff; }
-html, body { height: 100%; overflow: hidden; }
-body { background: var(--bg); color: var(--text); font-family: 'VT323','Courier New',monospace; font-size: 16px; display: flex; flex-direction: column; height: 100dvh; }
-header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 16px; display: flex; align-items: center; gap: 14px; flex-shrink: 0; height: 42px; }
-header h1 { font-family: '"Press Start 2P"',monospace; font-size: 11px; color: var(--purple); letter-spacing: .08em; }
-#h-meta { color: #8a8aab; font-size: 14px; flex: 1; }
-#h-dot { width: 9px; height: 9px; border-radius: 50%; background: #33334a; } #h-dot.live { background: var(--green); box-shadow: 0 0 8px var(--green); }
-#main { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 16px; }
-#status { font-size: 20px; min-height: 26px; } #status.deny { color: var(--red); } #status.win { color: var(--green); } #status.bust { color: var(--red); }
-#roles { display: flex; gap: 26px; font-size: 15px; }
-.role { font-family: '"Press Start 2P"',monospace; font-size: 9px; }
+/* Co-op Infiltration's own accent: a purple-tinted variant of the shared theme. */
+:root { --purple:#c08bff; }
+header h1 { color: var(--purple); }
+html, body { overflow: hidden; }
+body { height: 100dvh; }
+#main { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-4); padding: var(--sp-4); }
+#status.bust { color: var(--red); }
+#roles { display: flex; gap: var(--sp-6); font-size: 14px; }
+.role { font-size: 11px; font-weight: 700; letter-spacing: .04em; }
 .role.hack { color: var(--blue); } .role.muscle { color: var(--gold); }
 .role.active { text-shadow: 0 0 10px currentColor; }
-#alarm { display: flex; gap: 8px; align-items: center; font-size: 15px; color: #8a8aab; }
-.pip { width: 16px; height: 16px; border-radius: 50%; border: 1px solid var(--border); background: var(--bg3); }
+#alarm { display: flex; gap: var(--sp-2); align-items: center; font-size: 14px; color: var(--muted); }
+.pip { width: 15px; height: 15px; border-radius: 50%; border: 1px solid var(--border); background: var(--bg3-solid); }
 .pip.on { background: var(--red); border-color: var(--red); box-shadow: 0 0 8px var(--red); }
-#path { display: flex; gap: 8px; align-items: stretch; }
-.stage { width: 120px; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 8px; display: flex; flex-direction: column; gap: 4px; align-items: center; opacity: .55; transition: opacity .15s, border-color .15s, transform .1s; }
-.stage .ic { font-size: 24px; } .stage .nm { font-size: 15px; text-align: center; line-height: 1.05; }
-.stage .rl { font-size: 11px; font-family: '"Press Start 2P"',monospace; }
+#path { display: flex; gap: var(--sp-2); align-items: stretch; }
+.stage { width: 118px; background: var(--bg3-solid); border: 1px solid var(--border); border-radius: var(--r-md); padding: var(--sp-3) var(--sp-2); display: flex; flex-direction: column; gap: var(--sp-1); align-items: center; opacity: .55; transition: opacity .15s var(--ease), border-color .15s var(--ease), transform .15s var(--ease); }
+.stage .ic { font-size: 22px; } .stage .nm { font-size: 13px; text-align: center; line-height: 1.1; }
+.stage .rl { font-size: 10px; font-weight: 700; letter-spacing: .04em; }
 .stage .rl.HACK { color: var(--blue); } .stage .rl.MUSCLE { color: var(--gold); }
 .stage.cleared { opacity: 1; border-color: var(--green); }
 .stage.cleared .ic::after { content:' ✓'; color: var(--green); }
 .stage.current { opacity: 1; border-color: var(--purple); transform: translateY(-3px); box-shadow: 0 0 12px rgba(192,139,255,.4); }
 .stage.current.mine { cursor: pointer; border-color: var(--blue); }
-.arrow { align-self: center; color: var(--muted); font-size: 18px; }
-.btn { background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: 'VT323',monospace; font-size: 16px; padding: 6px 14px; border-radius: 5px; cursor: pointer; }
+.arrow { align-self: center; color: var(--muted); font-size: 17px; }
 .btn:hover { border-color: var(--purple); color: var(--purple); }
-.btn.cheat:hover { border-color: var(--red); color: var(--red); }
 </style>
 </head>
 <body>

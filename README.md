@@ -38,9 +38,17 @@ browser client — open `http://localhost:8900` after starting.
 
 ```
 examples/      games, bots, web clients, Magentic Bazaar commerce demos
+  games.css    shared design system (tokens + header/button/status chrome) for
+               every dashboard; served at GET /games/games.css by the play host
 deploy/        the live referee's Dockerfile + compose + Caddy snippet (play.lexlang.org)
 scripts/       check_readme.sh (docs-in-sync gate), smoke.sh (lobby+game+bazaar, end to end)
 ```
+
+Each dashboard is a self-contained HTML file (no framework, no build step) that
+links `games.css` for shared chrome, then a small inline `<style>` block for
+its own board/pitch/pool visuals — several games (Co-op Infiltration, Charger
+Duel, Consent Match, Strategy Football) layer a page-specific accent color on
+top via a scoped `:root` override.
 
 The A2A core, the bazaar/haggle/seller-LLM mechanics, the tiny sidecar HTTP
 client, and the play host itself all live in **lex-robot**'s `src/` and
