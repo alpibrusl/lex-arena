@@ -57,7 +57,7 @@ jobs:
           done
           exit "$fail"
 
-      - name: Build the React SPA (lobby + tic-tac-toe pilot)
+      - name: Build the React SPA (lobby + all six games + arena)
         working-directory: web
         run: |
           npm ci
