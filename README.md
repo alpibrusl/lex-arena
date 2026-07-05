@@ -34,15 +34,17 @@ Every demo here runs on the **Lex-native play host**
 each game's or market's skills. Each demo ships a `*_run.sh` launcher and a
 browser client — open `http://localhost:8900` after starting.
 
-## The React SPA (lobby + tic-tac-toe — a pro-UI pilot)
+## The React SPA (lobby + all six games + BYO-key arena)
 
-The lobby and one game (tic-tac-toe, the reference game) are also a **React +
-TypeScript + Tailwind** single-page app in `web/` — a from-scratch rewrite
-aimed at a "modern SaaS dashboard" look (Inter + JetBrains Mono, a real
-spacing/shadow scale, one amber accent) rather than the retro-terminal style
-of the plain-HTML dashboards. It talks to the **exact same** `/skill/*` +
-`/events` API the vanilla-JS pages use — no backend changes, no new game
-logic, just a different frontend.
+The lobby and all six games are a **React + TypeScript + Tailwind**
+single-page app in `web/` — a from-scratch rewrite aimed at a "modern SaaS
+dashboard" look (Inter + JetBrains Mono, a real spacing/shadow scale, one
+amber accent) rather than the retro-terminal style of the plain-HTML
+dashboards. It talks to the **exact same** `/skill/*` + `/events` API the
+vanilla-JS pages use — no backend changes, no new game logic, just a
+different frontend. Three structurally-identical "draft from a pool" games
+(Bazaar Draft, Charger Duel, Consent Match) share a `usePoolGame` hook; Heist
+Co-op, Strategy Football, and the BYO-key Arena page are standalone.
 
 ```sh
 cd web && npm install
@@ -56,15 +58,15 @@ npm run dev   # Vite dev server at :5173, proxying /skill,/events,/api to :8900
 `deploy/Dockerfile` builds the SPA in a Node stage and bakes it into the same
 image that runs the referee.
 
-The other five games are still the legacy static dashboards below — the SPA
-rewrite is a pilot, not (yet) a full replacement; see the game grid's `▶ Play`
-links, which route to `/play/ttt` (the SPA) for tic-tac-toe and out to the
-legacy `examples/*_web.html` pages for the rest.
+The plain-HTML dashboards under `examples/*_web.html` remain as
+framework-free reference clients for the `*_run.sh` launcher scripts (handy
+when scripting a demo without a Node toolchain); the game grid's `▶ Play`
+links all route to the SPA (`/play/<game>`, `/play/arena`).
 
 ## Layout
 
 ```
-web/           the React SPA (lobby + tic-tac-toe pilot) — builds to examples-dist/
+web/           the React SPA (lobby + all six games + BYO-key arena) — builds to examples-dist/
 examples/      games, bots, web clients, Magentic Bazaar commerce demos
   games.css    shared design system (tokens + header/button/status chrome) for
                every legacy dashboard; served at GET /games/games.css by the play host

@@ -1,6 +1,12 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Lobby } from './pages/Lobby'
 import { TicTacToe } from './pages/TicTacToe'
+import { BazaarDraft } from './pages/BazaarDraft'
+import { ConsentMatch } from './pages/ConsentMatch'
+import { ChargerDuel } from './pages/ChargerDuel'
+import { HeistCoop } from './pages/HeistCoop'
+import { StrategyFootball } from './pages/StrategyFootball'
+import { Arena } from './pages/Arena'
 
 export default function App() {
   return (
@@ -8,6 +14,12 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Lobby />} />
         <Route path="/play/ttt" element={<TicTacToe />} />
+        <Route path="/play/shop" element={<BazaarDraft />} />
+        <Route path="/play/love" element={<ConsentMatch />} />
+        <Route path="/play/ev" element={<ChargerDuel />} />
+        <Route path="/play/heist" element={<HeistCoop />} />
+        <Route path="/play/football" element={<StrategyFootball />} />
+        <Route path="/play/arena" element={<Arena />} />
       </Routes>
     </BrowserRouter>
   )
