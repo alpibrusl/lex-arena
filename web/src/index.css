@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+/* Lex Arena — the "modern SaaS dashboard" design system. Dark-mode-first
+ * (this product's whole identity is a dark technical console), one warm
+ * accent carried over from the brand ("LEX ARENA" was always gold), Inter
+ * for UI text, JetBrains Mono for anything data-shaped (hashes, scores,
+ * trail entries) — the split reinforces "provable, not decorative."
+ */
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --color-bg: #08090c;
+  --color-surface: #0e0f14;
+  --color-surface-hi: #14161d;
+  --color-border: #23252f;
+  --color-border-hi: #33364275;
+  --color-ink: #eceef2;
+  --color-muted: #8b8fa3;
+  --color-faint: #5b5f70;
+
+  --color-amber: #f0b429;
+  --color-amber-ink: #0d0a03;
+  --color-green: #3ddc84;
+  --color-red: #ff6b6b;
+  --color-blue: #5eb8ff;
+  --color-pink: #ff7ac6;
+  --color-violet: #b98aff;
+
+  --shadow-card: 0 1px 2px rgba(0,0,0,.3), 0 0 0 1px rgba(255,255,255,.02) inset;
+  --shadow-lift: 0 12px 32px -8px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.03) inset;
+  --shadow-glow: 0 0 0 1px var(--color-amber), 0 0 24px -6px rgba(240,180,41,.45);
+}
+
+html { color-scheme: dark; }
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+code, .font-data { font-family: var(--font-mono); }
+
+::selection { background: color-mix(in srgb, var(--color-amber) 35%, transparent); }
