@@ -23,7 +23,7 @@ import "std.map"   as map
 import "std.time"  as time
 import "std.crypto" as crypto
 
-import "../src/a2a_card" as card
+import "lex-robot/src/a2a_card" as card
 
 # ── helpers ──────────────────────────────────────────────────────────────────
 fn json_str(s :: Str) -> Str {

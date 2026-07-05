@@ -48,13 +48,13 @@ import "lex-schema/schema"     as s
 import "lex-schema/json_value" as jv
 import "lex-schema/error"      as e
 
-import "../src/human_goal"    as hgoal
+import "lex-robot/src/human_goal"    as hgoal
 
-import "../src/a2a_bootstrap" as boot
-import "../src/a2a_handshake" as hs
-import "../src/a2a_session"   as sess
-import "../src/a2a_consent"   as consent
-import "../src/a2a_card"      as card
+import "lex-robot/src/a2a_bootstrap" as boot
+import "lex-robot/src/a2a_handshake" as hs
+import "lex-robot/src/a2a_session"   as sess
+import "lex-robot/src/a2a_consent"   as consent
+import "lex-robot/src/a2a_card"      as card
 
 # ── HTTP helpers ──────────────────────────────────────────────────────────────
 

@@ -16,7 +16,7 @@ import "std.int" as int
 import "lex-llm/src/providers" as providers
 import "lex-llm/src/provider"  as prov
 
-import "../src/haggle" as haggle
+import "lex-robot/src/haggle" as haggle
 
 fn show(d :: haggle.Deal) -> [io] Unit {
   if d.closed {

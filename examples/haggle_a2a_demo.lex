@@ -16,8 +16,8 @@ import "std.str"  as str
 import "std.int"  as int
 import "std.list" as list
 
-import "../src/client" as client
-import "../src/haggle" as h
+import "lex-robot/src/client" as client
+import "lex-robot/src/haggle" as h
 
 import "lex-llm/src/providers" as providers
 import "lex-llm/src/provider"  as prov

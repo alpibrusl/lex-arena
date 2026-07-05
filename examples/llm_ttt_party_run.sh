@@ -8,6 +8,7 @@
 #     examples/llm_ttt_party_run.sh
 set -euo pipefail
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+LEX_ROBOT_PKG="${LEX_ROBOT_PKG:-$HOME/.lex/packages/lex-robot}"
 PORT="${LEX_ROBOT_SIDECAR_PORT:-8900}"; URL="http://localhost:${PORT}"
 LEX="${LEX:-lex}"
 KEY="${OPENCODE_API_KEY:-$(cat "$HOME/.credentials/opencode/key" 2>/dev/null || true)}"
@@ -23,7 +24,7 @@ rm -f "/tmp/lex-sidecar-${PORT}.db"
 
 echo "[party] starting TTT server on :${PORT} …"
 LEX_ROBOT_REPO_ROOT="$REPO_DIR" LEX_DASHBOARD_HTML=ttt_web.html LEX_ROBOT_SIDECAR_PORT="$PORT" \
-  $LEX run --allow-effects "$EFF" "$REPO_DIR/sidecar/sim_sidecar.lex" run >/tmp/party-server.log 2>&1 &
+  $LEX run --allow-effects "$EFF" "$LEX_ROBOT_PKG/sidecar/sim_sidecar.lex" run >/tmp/party-server.log 2>&1 &
 for i in $(seq 1 40); do curl -sf "$URL/health" >/dev/null 2>&1 && break; sleep 0.5; done
 
 echo "[party] ⚔  X = ${MODEL_X}   vs   O = ${MODEL_O}   (spectate: $URL)"

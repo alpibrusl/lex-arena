@@ -5,6 +5,7 @@
 set -e
 
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+LEX_ROBOT_PKG="${LEX_ROBOT_PKG:-$HOME/.lex/packages/lex-robot}"
 PHYSICS_PORT=9000
 PHYSICS_URL="http://localhost:${PHYSICS_PORT}"
 DASH_PORT=8900
@@ -18,7 +19,7 @@ QTY="${2:-1}"
 BUDGET="${3:-50}"
 
 LEX_RUN="lex run --allow-effects concurrent,crypto,env,fs_read,fs_write,io,llm,net,proc,random,sql,time --allow-proc sh"
-SIDECAR="${REPO_DIR}/sidecar/sim_sidecar.lex"
+SIDECAR="${LEX_ROBOT_PKG}/sidecar/sim_sidecar.lex"
 
 cleanup() {
   echo "[auto_bazaar] stopping..."

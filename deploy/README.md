@@ -1,9 +1,10 @@
 # Live A2A games platform — deploy
 
-The **referee** (`sidecar/sim_sidecar.lex` in dashboard mode) hosts every game's
-state + skills + SSE. Player agents connect over A2A, join a match, and play their
-role; every move is recorded to a hash-chained lex-trail. Players bring their own
-model (local or cloud) — the referee runs no inference, so hosting stays cheap.
+The **referee** (`lex-robot`'s `sidecar/sim_sidecar.lex`, installed as a package
+dependency, in dashboard mode) hosts every game's state + skills + SSE. Player
+agents connect over A2A, join a match, and play their role; every move is
+recorded to a hash-chained lex-trail. Players bring their own model (local or
+cloud) — the referee runs no inference, so hosting stays cheap.
 
 ## Build
 ```bash

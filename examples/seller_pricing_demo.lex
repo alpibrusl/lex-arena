@@ -20,7 +20,7 @@ import "std.io"  as io
 import "std.str" as str
 import "std.int" as int
 
-import "../src/seller_llm" as sllm
+import "lex-robot/src/seller_llm" as sllm
 
 fn run() -> [env, io, llm, net, proc] Int {
   let base := match env.get("LITELLM_BASE_URL") {

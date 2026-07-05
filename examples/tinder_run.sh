@@ -7,10 +7,11 @@
 set -e
 
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+LEX_ROBOT_PKG="${LEX_ROBOT_PKG:-$HOME/.lex/packages/lex-robot}"
 DASH_PORT=8900
 DASH_URL="http://localhost:${DASH_PORT}"
 LEX_RUN="lex run --allow-effects concurrent,crypto,env,fs_read,fs_write,io,llm,net,proc,random,sense,sql,time"
-SIDECAR="${REPO_DIR}/sidecar/sim_sidecar.lex"
+SIDECAR="${LEX_ROBOT_PKG}/sidecar/sim_sidecar.lex"
 
 cleanup() {
   echo "[tinder] stopping..."

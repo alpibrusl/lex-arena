@@ -39,7 +39,7 @@ RUN --mount=type=secret,id=github_token \
 
 # Fail the build if the referee doesn't type-check (catch dep drift at build time,
 # not container start).
-RUN lex check sidecar/sim_sidecar.lex
+RUN lex check /root/.lex/packages/lex-robot/sidecar/sim_sidecar.lex
 
 EXPOSE 8900
 ENV LEX_ROBOT_SIDECAR_PORT=8900 \
@@ -47,4 +47,4 @@ ENV LEX_ROBOT_SIDECAR_PORT=8900 \
     LEX_DASHBOARD_HTML=games_lobby.html
 
 # The dashboard/referee: serves the web UI + hosts every game's skills + SSE.
-CMD ["sh","-c","lex run --allow-effects concurrent,crypto,env,fs_read,fs_write,io,llm,net,proc,random,sql,time --allow-proc sh sidecar/sim_sidecar.lex run"]
+CMD ["sh","-c","lex run --allow-effects concurrent,crypto,env,fs_read,fs_write,io,llm,net,proc,random,sql,time --allow-proc sh /root/.lex/packages/lex-robot/sidecar/sim_sidecar.lex run"]

@@ -53,7 +53,7 @@ import "lex-llm/src/provider" as prov
 
 import "lex-llm/src/providers/openai" as oai
 
-import "../src/seller_llm" as sllm
+import "lex-robot/src/seller_llm" as sllm
 
 # A stall: `kind` selects the seller's pricing personality; `base` is its cost;
 # `value` is the buyer's private utility; `price` is filled by the seller LLM.

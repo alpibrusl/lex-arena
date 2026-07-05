@@ -42,7 +42,7 @@ import "lex-guard/src/x402_mock_exec" as x402m
 
 import "lex-games/src/arena/trail_file" as tf
 
-import "../src/seller_llm" as sllm
+import "lex-robot/src/seller_llm" as sllm
 
 # A seller stall. `kind` selects the LLM pricing personality (pottery=Karim,
 # textile=Lena, spices=Spice Trader); `base` is its private cost.

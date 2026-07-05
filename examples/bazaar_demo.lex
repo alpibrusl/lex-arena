@@ -56,13 +56,13 @@ import "lex-trail/src/log" as tlog
 
 import "lex-llm/src/providers/vertex" as vtx
 
-import "../src/a2a_card" as card
+import "lex-robot/src/a2a_card" as card
 
-import "../src/a2a_llm_fallback" as llm
+import "lex-robot/src/a2a_llm_fallback" as llm
 
-import "../src/bazaar" as baz
+import "lex-robot/src/bazaar" as baz
 
-import "../src/bazaar_llm" as bll
+import "lex-robot/src/bazaar_llm" as bll
 
 # ── Stall seeds (sim: known to both sides; in prod each seller holds its own) ──
 fn pottery_secret() -> Bytes {
@@ -164,11 +164,11 @@ fn llm_safety_test(stall :: baz.StallInfo, policy :: { allowed_pubkeys :: List[S
 }
 
 # Helper: run audited handshake + open session (used in LLM test).
-import "../src/a2a_audit" as audit
+import "lex-robot/src/a2a_audit" as audit
 
-import "../src/a2a_session" as sess
+import "lex-robot/src/a2a_session" as sess
 
-import "../src/a2a_bootstrap" as boot
+import "lex-robot/src/a2a_bootstrap" as boot
 
 fn llm_audit_run(blob :: boot.BootstrapBlob, policy :: { allowed_pubkeys :: List[Str], allowed_skills :: List[Str], max_tier :: card.CardTier, require_https :: Bool, max_budget_actions :: Int, max_budget_ms :: Int }, now :: Int, log :: tlog.Log, parent :: Str) -> [net, sql, time] (Option[sess.PeerSession], Str) {
   match audit.run_audited(blob, policy, now, log, parent, []) {

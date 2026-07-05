@@ -45,13 +45,13 @@ import "lex-llm/src/provider" as prov
 
 import "lex-llm/src/providers/vertex" as vtx
 
-import "../src/a2a_card" as card
+import "lex-robot/src/a2a_card" as card
 
-import "../src/a2a_consent" as consent
+import "lex-robot/src/a2a_consent" as consent
 
-import "../src/bazaar" as baz
+import "lex-robot/src/bazaar" as baz
 
-import "../src/bazaar_llm" as bll
+import "lex-robot/src/bazaar_llm" as bll
 
 # ── Stall secrets (sim: fixed; in prod each seller holds its own) ──────────────
 fn pottery_secret() -> Bytes { bytes.from_str("00000000000000000000000000000001") }

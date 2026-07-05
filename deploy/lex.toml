@@ -1,19 +1,23 @@
 # Referee-only manifest for the live game-server image. The referee imports
-# lex-schema/games/trail/web directly and lex-llm transitively (via src/seller_llm);
-# it never needs the lex-jobs/lex-guard path deps the dev manifest carries.
+# lex-schema/games/trail/web directly and lex-llm transitively (via
+# lex-robot/src/seller_llm); it never needs the lex-jobs/lex-guard path deps
+# the dev manifest carries. lex-robot is now a real cross-repo dependency
+# (not a local path) — the referee itself, sim_sidecar.lex, and the A2A/
+# bazaar/haggle/seller-LLM mechanics all live there (lex-robot#75).
 #
 # Deps track `main` (a coherent set — the flat layout requires one version of each
 # across the whole transitive closure, and lex has no lockfile to pin it). The
 # build is made reproducible by pinning the LEX VERSION (Dockerfile LEX_VERSION)
 # to what `main` compiles under. Revisit if lex gains lockfiles.
 [package]
-name    = "lex-robot"
+name    = "lex-arena"
 version = "0.1.0"
 lex     = "0.10.0"
 license = "EUPL-1.2"
-description = "lex-robot live game referee (deploy image)"
+description = "lex-arena live game referee (deploy image)"
 
 [dependencies]
+lex-robot  = { git = "https://github.com/alpibrusl/lex-robot" }
 lex-trail  = { git = "https://github.com/alpibrusl/lex-trail" }
 lex-llm    = { git = "https://github.com/alpibrusl/lex-llm" }
 lex-schema = { git = "https://github.com/alpibrusl/lex-schema" }

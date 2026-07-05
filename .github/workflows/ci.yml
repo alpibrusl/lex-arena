@@ -1,0 +1,55 @@
+name: ci
+
+# Gates the repo on the same thing a newcomer does: install the published `lex`
+# toolchain, resolve dependencies (including lex-robot, which owns the shared
+# A2A/bazaar core and the play host — see lex-robot#75), type-check everything,
+# confirm the README still matches the code, and run the lobby + one game + one
+# bazaar demo end to end (the extraction's acceptance bar).
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    env:
+      LEX_VERSION: v0.10.0
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install lex toolchain
+        run: |
+          set -euo pipefail
+          tgt=x86_64-unknown-linux-gnu
+          url="https://github.com/alpibrusl/lex-lang/releases/download/${LEX_VERSION}/lex-${LEX_VERSION}-${tgt}.tar.gz"
+          curl -fsSL "$url" -o /tmp/lex.tgz
+          tar -xzf /tmp/lex.tgz -C /tmp
+          sudo mv "/tmp/lex-${LEX_VERSION}-${tgt}/lex" /usr/local/bin/lex
+          lex version
+
+      - name: Install dependencies (lex-robot, lex-games, ...)
+        run: lex pkg install
+
+      - name: README in sync with code
+        run: bash scripts/check_readme.sh
+
+      - name: Type-check every example
+        run: |
+          set -euo pipefail
+          fail=0
+          for f in $(find examples -name '*.lex'); do
+            lex check "$f" || fail=1
+          done
+          exit "$fail"
+
+      - name: Smoke (lobby + one game + one bazaar demo, end to end)
+        run: bash scripts/smoke.sh

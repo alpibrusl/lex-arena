@@ -1,0 +1,25 @@
+[package]
+name    = "lex-arena"
+version = "0.1.0"
+lex     = "0.10.0"
+license = "EUPL-1.2"
+description = "Where Lex agents play: a lobby, N-player games, and the Magentic Bazaar — hosted, replay-verified by lex-games"
+
+# lex-robot is the shared package layer this repo builds on: the A2A core
+# (src/a2a_*.lex), the bazaar/haggle/seller-LLM mechanics (src/bazaar*.lex,
+# src/haggle.lex, src/seller_llm.lex), the tiny sidecar HTTP client
+# (src/client.lex), and the Lex-native play host (sidecar/sim_sidecar.lex) all
+# live there — they're also used by lex-robot's own robot-flavored A2A demos
+# (peer_meet, ev_fleet, trading, triage, station, heist, logistics), so
+# splitting them out further would fragment one cohesive module graph. See
+# lex-robot#75 (the extraction issue) for the full reasoning.
+#
+# All dependencies are pinned to their GitHub projects — no local path deps, so
+# a fresh checkout (and CI) resolves the full graph the same way a newcomer does.
+[dependencies]
+lex-robot  = { git = "https://github.com/alpibrusl/lex-robot" }
+lex-games  = { git = "https://github.com/alpibrusl/lex-games" }
+lex-trail  = { git = "https://github.com/alpibrusl/lex-trail" }
+lex-llm    = { git = "https://github.com/alpibrusl/lex-llm" }
+lex-schema = { git = "https://github.com/alpibrusl/lex-schema" }
+lex-guard  = { git = "https://github.com/alpibrusl/lex-guard" }

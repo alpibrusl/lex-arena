@@ -9,6 +9,7 @@
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+LEX_ROBOT_PKG="${LEX_ROBOT_PKG:-$HOME/.lex/packages/lex-robot}"
 STALL_PORT="${STALL_PORT:-8901}"
 STALL_URL="http://localhost:${STALL_PORT}"
 BASE="${LITELLM_BASE_URL:-http://localhost:4000}"
@@ -34,7 +35,7 @@ LITELLM_BASE_URL="${BASE}" LITELLM_MODEL="${MODEL}" \
 LEX_STALL_NAME=pottery \
 LEX_ROBOT_SIDECAR_PORT="${STALL_PORT}" \
 LEX_ROBOT_REPO_ROOT="${REPO_DIR}" \
-  ${LEX_RUN} "${REPO_DIR}/sidecar/sim_sidecar.lex" run &
+  ${LEX_RUN} "${LEX_ROBOT_PKG}/sidecar/sim_sidecar.lex" run &
 STALL_PID=$!
 
 for _ in $(seq 1 50); do

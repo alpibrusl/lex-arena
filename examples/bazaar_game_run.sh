@@ -9,6 +9,7 @@
 set -e
 
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+LEX_ROBOT_PKG="${LEX_ROBOT_PKG:-$HOME/.lex/packages/lex-robot}"
 DASH_PORT=8900
 DASH_URL="http://localhost:${DASH_PORT}"
 LEX_RUN="lex run --allow-effects concurrent,crypto,env,fs_read,fs_write,io,llm,net,proc,random,sense,sql,time"
@@ -22,7 +23,7 @@ rm -f "/tmp/lex-sidecar-${DASH_PORT}.db"
 
 echo "[bazaar-game] starting game server on :${DASH_PORT} ..."
 LEX_ROBOT_REPO_ROOT="${REPO_DIR}" LEX_DASHBOARD_HTML=bazaar_game_web.html LEX_ROBOT_SIDECAR_PORT=${DASH_PORT} \
-  ${LEX_RUN} "${REPO_DIR}/sidecar/sim_sidecar.lex" run &
+  ${LEX_RUN} "${LEX_ROBOT_PKG}/sidecar/sim_sidecar.lex" run &
 SRV_PID=$!
 
 for i in $(seq 1 20); do curl -sf "${DASH_URL}/health" >/dev/null 2>&1 && break; sleep 0.5; done

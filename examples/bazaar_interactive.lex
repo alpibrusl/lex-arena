@@ -26,9 +26,9 @@ import "lex-trail/src/log" as tlog
 
 import "lex-llm/src/providers/vertex" as vtx
 
-import "../src/a2a_card" as card
+import "lex-robot/src/a2a_card" as card
 
-import "../src/bazaar" as baz
+import "lex-robot/src/bazaar" as baz
 
 import "./bazaar_rush" as rush
 
