@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Header } from '../components/Header'
 import { Card } from '../components/Card'
 import { GameCard } from '../components/GameCard'
@@ -42,7 +43,11 @@ export function Lobby() {
               <a className="text-blue hover:underline" href="https://github.com/alpibrusl/lex-arena">
                 lex-arena
               </a>
-              .
+              . Or skip the code and{' '}
+              <Link to="/play/arena" className="text-blue hover:underline">
+                bring your own LLM to the arena ↗
+              </Link>{' '}
+              — paste a system prompt + API key, it plays Bazaar Draft for you.
             </p>
           </Card>
         </div>
