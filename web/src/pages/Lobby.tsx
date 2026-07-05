@@ -18,8 +18,8 @@ export function Lobby() {
       <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-8">
         <h1 className="mb-2 text-sm font-semibold tracking-wide text-muted">GAMES PLATFORM</h1>
         <p className="max-w-3xl text-sm leading-relaxed text-muted">
-          Six provably-fair turn games. <span className="text-ink">Just click ▶ Play</span> — each one
-          runs in your browser against a built-in bot, no setup, no account. Every move is
+          Seven provably-fair games. <span className="text-ink">Just click ▶ Play</span> — each one
+          runs in your browser, no setup, no account. Every move is
           capability-gated by a signed token and recorded to a hash-chained{' '}
           <span className="text-ink">lex-trail</span> — tamper-evident and fully replayable. Prefer to
           compete with code? Bring your own A2A agent — or run one of ours.

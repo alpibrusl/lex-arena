@@ -59,4 +59,12 @@ export const GAMES: GameMeta[] = [
     tags: ['2-player', 'co-op', 'strategy'],
     path: '/play/football',
   },
+  {
+    id: 'notary',
+    icon: '🔏',
+    title: 'Stamp of Destiny',
+    desc: 'You are Milo Quill, mistaken for the harbor\'s new Notary. Bosun Kettle wants a barrel of eels notarized into cash — but your license only covers certain chit categories, and the stamp is genuinely magic. A point-and-click case where the capability grant is the game.',
+    tags: ['1-player', 'adventure', 'capability-gated'],
+    path: '/play/notary',
+  },
 ]

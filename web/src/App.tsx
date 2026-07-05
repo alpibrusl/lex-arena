@@ -6,6 +6,7 @@ import { ConsentMatch } from './pages/ConsentMatch'
 import { ChargerDuel } from './pages/ChargerDuel'
 import { HeistCoop } from './pages/HeistCoop'
 import { StrategyFootball } from './pages/StrategyFootball'
+import { Notary } from './pages/Notary'
 import { Arena } from './pages/Arena'
 
 export default function App() {
@@ -19,6 +20,7 @@ export default function App() {
         <Route path="/play/ev" element={<ChargerDuel />} />
         <Route path="/play/heist" element={<HeistCoop />} />
         <Route path="/play/football" element={<StrategyFootball />} />
+        <Route path="/play/notary" element={<Notary />} />
         <Route path="/play/arena" element={<Arena />} />
       </Routes>
     </BrowserRouter>

@@ -49,11 +49,11 @@ check_dashboard "games_lobby.html" "Lex Arena" "lobby: games_lobby.html serves a
 check_dashboard "ttt_web.html"     "tic-tac-toe" "game: tic-tac-toe (ttt_web.html) serves and is healthy"
 check_dashboard "bazaar_web.html"  "Bazaar" "bazaar: bazaar_web.html serves and is healthy"
 
-# The React SPA (lobby + all six games + BYO-key arena, lex-robot#87): built
+# The React SPA (lobby + all seven games + BYO-key arena, lex-robot#87): built
 # by CI into examples-dist/ before this script runs. LEX_ARENA_SPA_DIR opts
 # the play host into serving it instead of the legacy dashboard at / and
 # /play/:game.
-echo "== React SPA (lobby + all six games + arena) =="
+echo "== React SPA (lobby + all seven games + arena) =="
 if [ -f "$ROOT/examples-dist/index.html" ]; then
   pkill -f "sim_sidecar.lex" >/dev/null 2>&1 || true
   sleep 0.5
@@ -69,12 +69,31 @@ if [ -f "$ROOT/examples-dist/index.html" ]; then
   root_html="$(curl -sf "http://127.0.0.1:${PORT}/" 2>/dev/null)"
   play_html="$(curl -sf "http://127.0.0.1:${PORT}/play/ttt" 2>/dev/null)"
   arena_html="$(curl -sf "http://127.0.0.1:${PORT}/play/arena" 2>/dev/null)"
+  notary_html="$(curl -sf "http://127.0.0.1:${PORT}/play/notary" 2>/dev/null)"
   asset_path="$(grep -oE '/assets/[A-Za-z0-9_.-]+\.js' "$ROOT/examples-dist/index.html" | head -1)"
   asset_status="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:${PORT}${asset_path}" 2>/dev/null)"
   if [ "$ok" -eq 1 ] && grep -qF "Lex Arena" <<<"$root_html"; then pass "SPA: / serves the built index.html"; else bad "SPA: / did not serve the built SPA"; fi
   if grep -qF "Lex Arena" <<<"$play_html"; then pass "SPA: /play/ttt (client route) falls back to index.html"; else bad "SPA: /play/ttt did not serve the SPA shell"; fi
   if grep -qF "Lex Arena" <<<"$arena_html"; then pass "SPA: /play/arena (BYO-key page) falls back to index.html"; else bad "SPA: /play/arena did not serve the SPA shell"; fi
+  if grep -qF "Lex Arena" <<<"$notary_html"; then pass "SPA: /play/notary (Stamp of Destiny) falls back to index.html"; else bad "SPA: /play/notary did not serve the SPA shell"; fi
   if [ "$asset_status" = "200" ]; then pass "SPA: hashed JS bundle serves from /assets/"; else bad "SPA: JS bundle asset returned $asset_status"; fi
+
+  # Stamp of Destiny — exercise the actual skill API, not just page load:
+  # reset -> join -> an out-of-license stamp is refused -> a legal-but-reversed
+  # stamp doesn't solve the case -> the right-side-up stamp solves it -> the
+  # chain verifies.
+  curl -s -X POST "http://127.0.0.1:${PORT}/skill/notary_reset" -d '{}' >/dev/null
+  join_json="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/notary_join" -d '{"side":"MILO"}')"
+  tok="$(echo "$join_json" | grep -oE '"token":"[^"]+"' | cut -d'"' -f4)"
+  denied="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/notary_notarize" -d "{\"option\":0,\"orientation\":\"normal\",\"token\":\"${tok}\"}")"
+  if grep -qF '"status":"denied"' <<<"$denied"; then pass "notary: out-of-license category is refused"; else bad "notary: out-of-license category should be refused: $denied"; fi
+  reversed="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/notary_notarize" -d "{\"option\":1,\"orientation\":\"reversed\",\"token\":\"${tok}\"}")"
+  if grep -qF '"solved":false' <<<"$reversed"; then pass "notary: a legal reversed stamp is legal but doesn't solve the case"; else bad "notary: reversed stamp should be legal but unsolved: $reversed"; fi
+  solved="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/notary_notarize" -d "{\"option\":1,\"orientation\":\"normal\",\"token\":\"${tok}\"}")"
+  if grep -qF '"solved":true' <<<"$solved"; then pass "notary: the right-side-up stamp solves the case"; else bad "notary: right-side-up stamp should solve the case: $solved"; fi
+  nverify="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/game_verify" -d '{"game":"notary"}')"
+  if grep -qF '"valid":true' <<<"$nverify"; then pass "notary: chain verifies"; else bad "notary: chain should verify: $nverify"; fi
+
   lsof -ti ":${PORT}" 2>/dev/null | xargs -r kill -9 2>/dev/null || true
   sleep 0.5
 else
