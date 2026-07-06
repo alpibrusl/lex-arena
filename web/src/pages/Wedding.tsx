@@ -135,13 +135,18 @@ export function Wedding() {
   const career = state?.career ?? { did: brokerDid, rep: 0, events: 0 }
   const brokerName = String(career.did || brokerDid).replace('did:lex:agent:', '')
 
+  const tierName: string = career.tier_name ?? 'Backyard weddings'
+  const nextAt: number = career.next_at ?? 0
+
   const portraitMood = (g: any): Mood => {
     if (g.decision === 'approve') return 'happy'
     if (g.decision === 'deny') return 'annoyed'
-    if (g.mood === 'cold') return 'annoyed'
+    if (g.mood === 'cold' || g.mood === 'furious') return 'annoyed'
     if (g.mood === 'warm') return 'happy'
     return 'neutral'
   }
+  const slotHint =
+    slotsCap <= 1 ? 'only 1 — you can please just one of them' : 'only 2 — someone goes home unhappy'
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden">
@@ -152,14 +157,18 @@ export function Wedding() {
       />
       <div className="flex flex-1 min-h-0 flex-col items-center gap-4 overflow-y-auto p-4">
         {/* career strip */}
-        <div className="flex w-full max-w-3xl items-center justify-between gap-3 rounded-lg border border-border bg-surface-hi px-3.5 py-2 text-xs">
+        <div className="flex w-full max-w-3xl flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-lg border border-border bg-surface-hi px-3.5 py-2 text-xs">
           <span className="flex items-center gap-2">
             <span className="text-[10px] font-bold tracking-wide text-[var(--color-gold)]">BROKER</span>
             <span className="font-data text-ink">{brokerName}</span>
+            <span className="rounded-full border border-[var(--color-blush)]/50 px-2 py-0.5 text-[10px] font-medium text-blush">
+              {tierName}
+            </span>
           </span>
           <span className="flex items-center gap-4 text-muted">
             <span>
               ⭐ <span className="font-data text-ink">{career.rep}</span> rep
+              {nextAt > 0 && <span className="text-faint"> · {Math.max(0, nextAt - career.rep)} to promote</span>}
             </span>
             <span>
               <span className="font-data text-ink">{career.events}</span> {career.events === 1 ? 'wedding' : 'weddings'} brokered
@@ -188,7 +197,7 @@ export function Wedding() {
             {Array.from({ length: slotsCap }, (_, i) => (
               <SlotIcon key={i} filled={i < slotsUsed} className="h-4 w-4 text-muted" />
             ))}
-            <span className="ml-1 text-[11px] text-faint">only 2 — someone goes home unhappy</span>
+            <span className="ml-1 text-[11px] text-faint">{slotHint}</span>
           </div>
         </div>
 
@@ -234,9 +243,14 @@ export function Wedding() {
                 <div className="text-xs font-bold text-blush">{g.name}</div>
 
                 {/* memory badge — the payoff of a persistent cast */}
+                {g.mood === 'furious' && (
+                  <div className="rounded-full border border-red bg-red/10 px-2 py-0.5 text-[10px] font-bold text-red">
+                    🔥 furious — you {g.grudge || 'let them down'}, twice
+                  </div>
+                )}
                 {g.mood === 'cold' && (
                   <div className="rounded-full border border-red/50 px-2 py-0.5 text-[10px] font-medium text-red">
-                    🧊 remembers you {g.grudge || 'let them down'}
+                    {g.grudge ? `🧊 remembers you ${g.grudge}` : '🧊 still a little cool with you'}
                   </div>
                 )}
                 {g.mood === 'warm' && (
@@ -277,10 +291,25 @@ export function Wedding() {
         {/* settlement — the fallout writes back to the cast's memory */}
         {over && fallout && (
           <div className="w-full max-w-3xl rounded-xl border border-[var(--color-blush)] bg-surface-hi p-4">
+            {(fallout.move === 'promoted' || fallout.move === 'demoted') && (
+              <div
+                className={
+                  'mb-3 rounded-lg border px-3 py-2 text-center text-sm font-bold ' +
+                  (fallout.move === 'promoted'
+                    ? 'border-green bg-green/10 text-green'
+                    : 'border-red bg-red/10 text-red')
+                }
+              >
+                {fallout.move === 'promoted' ? '▲ Promoted' : '▼ Relegated'} to {fallout.tier_name}
+              </div>
+            )}
             <div className="mb-3 flex items-center justify-between">
               <span className="text-[11px] font-bold tracking-wide text-[var(--color-gold)]">THE FALLOUT · they'll remember this</span>
               <span className="text-[11px] text-muted">
-                ＋10 rep · now <span className="font-data text-ink">{fallout.events}</span> brokered
+                <span className={'font-data ' + (fallout.rep_delta >= 0 ? 'text-green' : 'text-red')}>
+                  {fallout.rep_delta >= 0 ? `+${fallout.rep_delta}` : fallout.rep_delta} rep
+                </span>{' '}
+                → <span className="font-data text-ink">{fallout.rep}</span> · {fallout.events} brokered
               </span>
             </div>
             <div className="grid gap-2 sm:grid-cols-3">
@@ -288,8 +317,15 @@ export function Wedding() {
                 <div key={f.id} className="flex flex-col items-center gap-1 rounded-lg border border-border bg-surface p-2.5 text-center">
                   <GuestPortrait id={f.id} mood={f.approved ? 'happy' : 'annoyed'} className="h-10 w-10 rounded-full" />
                   <div className="text-[11px] font-bold text-blush">{f.name}</div>
-                  <div className={'font-data text-[11px] ' + (f.delta > 0 ? 'text-green' : 'text-red')}>
-                    {f.delta > 0 ? `▲ +${f.delta}` : `▼ ${f.delta}`} regard
+                  <div className="flex items-center gap-1.5 font-data text-[11px]">
+                    <span className={f.delta > 0 ? 'text-green' : 'text-red'}>
+                      {f.delta > 0 ? `▲ +${f.delta}` : `▼ ${f.delta}`} regard
+                    </span>
+                    {typeof f.rep_delta === 'number' && (
+                      <span className={'text-[10px] ' + (f.rep_delta >= 0 ? 'text-green/70' : 'text-red/70')}>
+                        {f.rep_delta >= 0 ? `+${f.rep_delta}` : f.rep_delta} rep
+                      </span>
+                    )}
                   </div>
                   <div className="text-[10px] leading-snug text-muted">
                     {f.grudge

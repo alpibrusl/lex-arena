@@ -124,6 +124,47 @@ if [ -f "$ROOT/examples-dist/index.html" ]; then
   kmood="$(echo "$wstate2" | python3 -c "import sys,json; d=json.load(sys.stdin); print(next(g['mood'] for g in d['guests'] if g['id']=='kamala'))" 2>/dev/null)"
   if [ "$kmood" = "cold" ]; then pass "wedding: event two opens cold — Kamala remembers being denied"; else bad "wedding: Kamala should open cold in event two, got mood=$kmood"; fi
 
+  # P2: the reputation economy — denying a guest who is already cold costs more
+  # than denying a neutral one (rep_delta is smaller / negative). Deny Kamala a
+  # second time and confirm the event's rep_delta is below the first event's.
+  wjoin2="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_join" -d '{"side":"PLANNER"}')"
+  wtok2="$(echo "$wjoin2" | grep -oE '"token":"[^"]+"' | cut -d'"' -f4)"
+  curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_talk" -d "$WDID" >/dev/null
+  curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_rule" -d "{\"guest\":\"deb\",\"decision\":\"approve\",\"token\":\"${wtok2}\"}" >/dev/null
+  curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_rule" -d "{\"guest\":\"jonah\",\"decision\":\"approve\",\"token\":\"${wtok2}\"}" >/dev/null
+  curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_rule" -d "{\"guest\":\"kamala\",\"decision\":\"deny\",\"token\":\"${wtok2}\"}" >/dev/null
+  wsettle2="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_settle" -d "$WDID")"
+  rd2="$(echo "$wsettle2" | python3 -c "import sys,json; print(json.load(sys.stdin)['rep_delta'])" 2>/dev/null)"
+  if [ -n "$rd2" ] && [ "$rd2" -lt 10 ]; then pass "wedding: denying a cold guest again costs more rep (delta $rd2 < the +10 first burn)"; else bad "wedding: cold-deny should cost more, rep_delta=$rd2"; fi
+
+  # P2: venue tiers gate difficulty — a high-standing broker plays The society
+  # wedding (1 slot), where a second approval is refused. Climb a fresh did to a
+  # high rep by rotating the denied guest between Deb and Jonah (never Kamala, so
+  # the approved pair always includes free Kamala and stays under even the tier-2
+  # budget squeeze). Alternating denials avoids the furious penalty, so rep
+  # climbs monotonically past the top-tier threshold.
+  VDID='{"broker_did":"did:lex:agent:broker-tiers"}'
+  vdeny() { # $1 = guest to deny; approve the other two (always affordable)
+    curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_reset" -d "$VDID" >/dev/null
+    vj="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_join" -d '{"side":"PLANNER"}')"
+    vt="$(echo "$vj" | grep -oE '"token":"[^"]+"' | cut -d'"' -f4)"
+    for g in deb kamala jonah; do
+      dec=approve; [ "$g" = "$1" ] && dec=deny
+      curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_rule" -d "{\"guest\":\"${g}\",\"decision\":\"${dec}\",\"token\":\"${vt}\"}" >/dev/null
+    done
+    curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_settle" -d "$VDID" >/dev/null
+  }
+  vdeny deb; vdeny jonah; vdeny deb; vdeny jonah; vdeny deb; vdeny jonah
+  curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_reset" -d "$VDID" >/dev/null
+  vstate="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_state" -d "$VDID")"
+  vslots="$(echo "$vstate" | python3 -c "import sys,json; print(json.load(sys.stdin)['slots_cap'])" 2>/dev/null)"
+  if [ "$vslots" = "1" ]; then pass "wedding: standing gates the venue — top tier collapses to a single slot"; else bad "wedding: high-rep broker should be at 1 slot, got slots_cap=$vslots ($vstate)"; fi
+  vj2="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_join" -d '{"side":"PLANNER"}')"
+  vt2="$(echo "$vj2" | grep -oE '"token":"[^"]+"' | cut -d'"' -f4)"
+  curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_rule" -d "{\"guest\":\"kamala\",\"decision\":\"approve\",\"token\":\"${vt2}\"}" >/dev/null
+  vsecond="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_rule" -d "{\"guest\":\"jonah\",\"decision\":\"approve\",\"token\":\"${vt2}\"}")"
+  if grep -qF '"status":"refused"' <<<"$vsecond"; then pass "wedding: at the society wedding you can please only one — a 2nd approval is refused"; else bad "wedding: 2nd approve should be refused at 1 slot: $vsecond"; fi
+
   lsof -ti ":${PORT}" 2>/dev/null | xargs -r kill -9 2>/dev/null || true
   sleep 0.5
 else
