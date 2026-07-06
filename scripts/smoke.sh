@@ -96,13 +96,16 @@ if [ -f "$ROOT/examples-dist/index.html" ]; then
   nverify="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/game_verify" -d '{"game":"notary"}')"
   if grep -qF '"valid":true' <<<"$nverify"; then pass "notary: chain verifies"; else bad "notary: chain should verify: $nverify"; fi
 
-  # The Wedding Broker — exercise the actual skill API: reset -> join -> talk
-  # (chained negotiation) -> approve Deb+Jonah (exactly exhausts both caps) ->
-  # Kamala is refused (no room left) -> deny her -> chain verifies.
-  curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_reset" -d '{}' >/dev/null
+  # The Wedding Broker — exercise the actual skill API for a persistent broker:
+  # event 1 -> approve Deb+Jonah (exactly exhausts both caps), Kamala refused,
+  # deny her -> chain verifies -> settle writes the fallout to memory. Then
+  # event 2 for the SAME did:lex proves the career persists and Kamala opens
+  # cold ("event two opens angry" — the whole P1 bet).
+  WDID='{"broker_did":"did:lex:agent:broker-smoke"}'
+  curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_reset" -d "$WDID" >/dev/null
   wjoin_json="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_join" -d '{"side":"PLANNER"}')"
   wtok="$(echo "$wjoin_json" | grep -oE '"token":"[^"]+"' | cut -d'"' -f4)"
-  curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_talk" -d '{}' >/dev/null
+  curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_talk" -d "$WDID" >/dev/null
   wdeb="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_rule" -d "{\"guest\":\"deb\",\"decision\":\"approve\",\"token\":\"${wtok}\"}")"
   if grep -qF '"status":"ruled"' <<<"$wdeb"; then pass "wedding: Deb's request is approved"; else bad "wedding: Deb should be approvable: $wdeb"; fi
   curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_rule" -d "{\"guest\":\"jonah\",\"decision\":\"approve\",\"token\":\"${wtok}\"}" >/dev/null
@@ -112,6 +115,14 @@ if [ -f "$ROOT/examples-dist/index.html" ]; then
   if grep -qF '"over":true' <<<"$wover"; then pass "wedding: denying Kamala resolves the case"; else bad "wedding: the case should resolve: $wover"; fi
   wverify="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/game_verify" -d '{"game":"wedding"}')"
   if grep -qF '"valid":true' <<<"$wverify"; then pass "wedding: chain verifies"; else bad "wedding: chain should verify: $wverify"; fi
+  wsettle="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_settle" -d "$WDID")"
+  if grep -qF '"status":"settled"' <<<"$wsettle"; then pass "wedding: the event settles and writes fallout"; else bad "wedding: settle should succeed: $wsettle"; fi
+  # Event 2, same broker: career persists and Kamala carries her grudge in cold.
+  curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_reset" -d "$WDID" >/dev/null
+  wstate2="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_state" -d "$WDID")"
+  if grep -qE '"events":[1-9]' <<<"$wstate2"; then pass "wedding: the career persists across a reset (events >= 1)"; else bad "wedding: career events should persist: $wstate2"; fi
+  kmood="$(echo "$wstate2" | python3 -c "import sys,json; d=json.load(sys.stdin); print(next(g['mood'] for g in d['guests'] if g['id']=='kamala'))" 2>/dev/null)"
+  if [ "$kmood" = "cold" ]; then pass "wedding: event two opens cold — Kamala remembers being denied"; else bad "wedding: Kamala should open cold in event two, got mood=$kmood"; fi
 
   lsof -ti ":${PORT}" 2>/dev/null | xargs -r kill -9 2>/dev/null || true
   sleep 0.5
