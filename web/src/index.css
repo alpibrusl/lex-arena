@@ -43,3 +43,14 @@ body {
 code, .font-data { font-family: var(--font-mono); }
 
 ::selection { background: color-mix(in srgb, var(--color-amber) 35%, transparent); }
+
+/* Stamp of Destiny — the seal slams down from above, overshoots slightly,
+ * settles at a rakish angle. Gives the "Stamp it" action a physical beat
+ * instead of just a text update. */
+@keyframes stamp-slam {
+  0%   { transform: translate(-50%, -50%) translateY(-90px) rotate(-30deg) scale(1.5); opacity: 0; }
+  55%  { transform: translate(-50%, -50%) translateY(4px) rotate(-6deg) scale(1.05); opacity: 1; }
+  75%  { transform: translate(-50%, -50%) translateY(-2px) rotate(-10deg) scale(0.98); }
+  100% { transform: translate(-50%, -50%) translateY(0) rotate(-8deg) scale(1); opacity: 1; }
+}
+.animate-stamp-slam { animation: stamp-slam 550ms cubic-bezier(.2,.8,.3,1) both; }

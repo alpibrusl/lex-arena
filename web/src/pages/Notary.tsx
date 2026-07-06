@@ -3,6 +3,7 @@ import { Header } from '../components/Header'
 import { Button } from '../components/Button'
 import { callSkill, verifyChain } from '../lib/api'
 import { useEvents } from '../lib/useEvents'
+import { BoothScene, BosunPortrait, BarrelIcon, StampSeal } from '../components/NotaryArt'
 
 type Orientation = 'normal' | 'reversed'
 
@@ -13,6 +14,7 @@ export function Notary() {
   const [plea, setPlea] = useState('')
   const [orientation, setOrientation] = useState<Orientation>('normal')
   const [verdict, setVerdict] = useState('')
+  const [stamping, setStamping] = useState<number | null>(null)
   const tokenRef = useRef('')
 
   const fetchState = useCallback(async () => setState(await callSkill('notary_state')), [])
@@ -36,8 +38,10 @@ export function Notary() {
   }, [fetchState])
   const notarize = useCallback(
     async (option: number, orient: Orientation) => {
+      setStamping(option)
       await callSkill('notary_notarize', { option, orientation: orient, token: tokenRef.current })
       await fetchState()
+      window.setTimeout(() => setStamping(null), 700)
     },
     [fetchState],
   )
@@ -95,7 +99,9 @@ export function Notary() {
   return (
     <div className="flex h-dvh flex-col overflow-hidden">
       <Header meta="you're not really a notary · the stamp is genuinely magic · every legal stamp is hash-chained" back live={live} />
-      <div className="flex flex-1 min-h-0 flex-col items-center justify-center gap-4 p-4">
+      <div className="flex flex-1 min-h-0 flex-col items-center justify-center gap-4 overflow-y-auto p-4">
+        <BoothScene className="h-[70px] w-full max-w-xl rounded-xl border border-border" />
+
         <div
           className={
             'max-w-xl text-center text-base min-h-[22px] ' +
@@ -126,31 +132,43 @@ export function Notary() {
           ))}
         </div>
 
-        <div className="w-full max-w-xl rounded-xl border border-border bg-surface-hi p-3">
-          <div className="mb-1 text-[11px] font-bold tracking-wide text-violet">BOSUN KETTLE</div>
-          <div className="min-h-[40px] text-sm italic text-muted">
-            {plea || 'He hasn\'t said anything yet — talk to him.'}
-          </div>
-          {!state?.talked && (
-            <div className="mt-2">
-              <Button onClick={talk}>Talk to Bosun</Button>
+        <div className="flex w-full max-w-xl items-start gap-3 rounded-xl border border-border bg-surface-hi p-3">
+          <BosunPortrait className="h-14 w-14 shrink-0 rounded-full border border-violet/40" />
+          <div className="flex-1">
+            <div className="mb-1 text-[11px] font-bold tracking-wide text-violet">BOSUN KETTLE</div>
+            <div className="min-h-[40px] text-sm italic text-muted">
+              {plea || 'He hasn\'t said anything yet — talk to him.'}
             </div>
-          )}
+            {!state?.talked && (
+              <div className="mt-2">
+                <Button onClick={talk}>Talk to Bosun</Button>
+              </div>
+            )}
+          </div>
         </div>
 
         {state?.talked && !over && (
           <div className="grid w-full max-w-xl grid-cols-1 gap-3 sm:grid-cols-2">
-            <div className="flex flex-col gap-2 rounded-xl border border-red/60 bg-surface-hi p-3">
-              <div className="text-xs font-bold text-red">species_declaration</div>
+            <div className="relative flex flex-col gap-2 rounded-xl border border-red/60 bg-surface-hi p-3">
+              <div className="flex items-center gap-2">
+                <BarrelIcon className="h-6 w-6 shrink-0" />
+                <div className="text-xs font-bold text-red">species_declaration</div>
+              </div>
               <div className="text-sm">{opt0?.claim}</div>
               <div className="mt-auto">
                 <Button variant="danger" onClick={() => notarize(0, 'normal')}>
                   Stamp it
                 </Button>
               </div>
+              {stamping === 0 && (
+                <StampSeal className="animate-stamp-slam pointer-events-none absolute left-1/2 top-1/2 h-20 w-20 text-red" />
+              )}
             </div>
-            <div className="flex flex-col gap-2 rounded-xl border border-green/60 bg-surface-hi p-3">
-              <div className="text-xs font-bold text-green">goods_certification</div>
+            <div className="relative flex flex-col gap-2 rounded-xl border border-green/60 bg-surface-hi p-3">
+              <div className="flex items-center gap-2">
+                <BarrelIcon className="h-6 w-6 shrink-0" />
+                <div className="text-xs font-bold text-green">goods_certification</div>
+              </div>
               <div className="text-sm">{orientation === 'normal' ? opt1?.claim_normal : opt1?.claim_reversed}</div>
               <div className="mt-auto flex items-center gap-2">
                 <button
@@ -162,6 +180,9 @@ export function Notary() {
                 </button>
                 <Button onClick={() => notarize(1, orientation)}>Stamp it</Button>
               </div>
+              {stamping === 1 && (
+                <StampSeal className="animate-stamp-slam pointer-events-none absolute left-1/2 top-1/2 h-20 w-20 text-green" />
+              )}
             </div>
           </div>
         )}
