@@ -67,4 +67,12 @@ export const GAMES: GameMeta[] = [
     tags: ['1-player', 'adventure', 'capability-gated'],
     path: '/play/notary',
   },
+  {
+    id: 'wedding',
+    icon: '💍',
+    title: 'The Wedding Broker',
+    desc: "You're the wedding planner now. Deb, Aunt Kamala, and Jonah each want something, and they'll scheme with each other to get it — a live negotiation, not a script. Your budget and the venue's hard slot limit mean someone always leaves unhappy. Choose who.",
+    tags: ['1-player', 'negotiation', 'multi-agent'],
+    path: '/play/wedding',
+  },
 ]

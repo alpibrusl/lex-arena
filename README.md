@@ -1,6 +1,6 @@
 # lex-arena
 
-Where Lex agents play: a lobby, seven N-player games, and the **Magentic
+Where Lex agents play: a lobby, eight N-player games, and the **Magentic
 Bazaar** — a governed agent marketplace. Every game and every purchase runs on
 the same three primitives that govern a physical robot in
 [lex-robot](https://github.com/alpibrusl/lex-robot) — **capability · trail ·
@@ -34,18 +34,19 @@ Every demo here runs on the **Lex-native play host**
 each game's or market's skills. Each demo ships a `*_run.sh` launcher and a
 browser client — open `http://localhost:8900` after starting.
 
-## The React SPA (lobby + all seven games + BYO-key arena)
+## The React SPA (lobby + all eight games + BYO-key arena)
 
-The lobby and all seven games are a **React + TypeScript + Tailwind**
+The lobby and all eight games are a **React + TypeScript + Tailwind**
 single-page app in `web/` — a from-scratch rewrite aimed at a "modern SaaS
 dashboard" look (Inter + JetBrains Mono, a real spacing/shadow scale, one
 amber accent) rather than the retro-terminal style of the plain-HTML
 dashboards. It talks to the **exact same** `/skill/*` + `/events` API the
 vanilla-JS pages use — no backend changes, no new game logic, just a
-different frontend (except **Stamp of Destiny**, a new game shipped SPA-only —
-see below). Three structurally-identical "draft from a pool" games (Bazaar
-Draft, Charger Duel, Consent Match) share a `usePoolGame` hook; Heist Co-op,
-Strategy Football, Stamp of Destiny, and the BYO-key Arena page are standalone.
+different frontend (except **Stamp of Destiny** and **The Wedding Broker**,
+new games shipped SPA-only — see below). Three structurally-identical "draft
+from a pool" games (Bazaar Draft, Charger Duel, Consent Match) share a
+`usePoolGame` hook; Heist Co-op, Strategy Football, Stamp of Destiny, The
+Wedding Broker, and the BYO-key Arena page are standalone.
 
 ```sh
 cd web && npm install
@@ -67,7 +68,7 @@ links all route to the SPA (`/play/<game>`, `/play/arena`).
 ## Layout
 
 ```
-web/           the React SPA (lobby + all seven games + BYO-key arena) — builds to examples-dist/
+web/           the React SPA (lobby + all eight games + BYO-key arena) — builds to examples-dist/
 examples/      games, bots, web clients, Magentic Bazaar commerce demos
   games.css    shared design system (tokens + header/button/status chrome) for
                every legacy dashboard; served at GET /games/games.css by the play host
@@ -120,14 +121,16 @@ real A2A** — proving the gate holds against an outside agent, not just the UI.
 | Strategy Football | `examples/football_run.sh` | **you set the strategy**, a 2-agent squad coordinates over A2A (give-and-go) to score; match-bound tokens + Verify-chain |
 | N-player Bazaar | `examples/nplayer_bazaar_run.sh` / `nplayer_bazaar_llm_run.sh` | N agents draft from a shared pool; an ELO season ranks repeated matches |
 | Stamp of Destiny | `examples/notary_run.sh` | **single-player adventure**: the capability grant *is* the game — a fixed license covers only certain chit categories; an unscripted LLM NPC (Bosun Kettle) pushes for the out-of-scope shortcut; a stamp can be legal but useless (upside-down) |
+| The Wedding Broker | `examples/wedding_run.sh` | **social negotiation**: three guests scheme with each other over one LLM turn each, in sequence, each seeing the transcript so far; your authority is a fixed budget PLUS a separate slot cap the venue won't bend on, so someone is always turned down |
 | Consent match, one-on-one | `examples/tinder_run.sh` | the single-match version of Consent Match |
 | Party mode | `examples/llm_ttt_party_run.sh` | several LLM-driven agents queue for tic-tac-toe against each other |
 
 In every game a "play as the other side" cheat is refused at the capability layer
 and each move is hash-chained — the same properties, across every game above.
-(Stamp of Destiny is the one exception to "retro web client + `*_bot.lex`": it
-shipped SPA-only from day one, and its NPC runs inline in the sidecar rather
-than as a separate A2A process — see `web/src/pages/Notary.tsx`.)
+(Stamp of Destiny and The Wedding Broker are the exceptions to "retro web
+client + `*_bot.lex`": both shipped SPA-only from day one, and their NPCs run
+inline in the sidecar rather than as separate A2A processes — see
+`web/src/pages/Notary.tsx` and `web/src/pages/Wedding.tsx`.)
 
 ### A verifiable, BYO-key AI-agent arena
 
