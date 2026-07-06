@@ -49,11 +49,11 @@ check_dashboard "games_lobby.html" "Lex Arena" "lobby: games_lobby.html serves a
 check_dashboard "ttt_web.html"     "tic-tac-toe" "game: tic-tac-toe (ttt_web.html) serves and is healthy"
 check_dashboard "bazaar_web.html"  "Bazaar" "bazaar: bazaar_web.html serves and is healthy"
 
-# The React SPA (lobby + all seven games + BYO-key arena, lex-robot#87): built
+# The React SPA (lobby + all eight games + BYO-key arena, lex-robot#87): built
 # by CI into examples-dist/ before this script runs. LEX_ARENA_SPA_DIR opts
 # the play host into serving it instead of the legacy dashboard at / and
 # /play/:game.
-echo "== React SPA (lobby + all seven games + arena) =="
+echo "== React SPA (lobby + all eight games + arena) =="
 if [ -f "$ROOT/examples-dist/index.html" ]; then
   pkill -f "sim_sidecar.lex" >/dev/null 2>&1 || true
   sleep 0.5
@@ -70,12 +70,14 @@ if [ -f "$ROOT/examples-dist/index.html" ]; then
   play_html="$(curl -sf "http://127.0.0.1:${PORT}/play/ttt" 2>/dev/null)"
   arena_html="$(curl -sf "http://127.0.0.1:${PORT}/play/arena" 2>/dev/null)"
   notary_html="$(curl -sf "http://127.0.0.1:${PORT}/play/notary" 2>/dev/null)"
+  wedding_html="$(curl -sf "http://127.0.0.1:${PORT}/play/wedding" 2>/dev/null)"
   asset_path="$(grep -oE '/assets/[A-Za-z0-9_.-]+\.js' "$ROOT/examples-dist/index.html" | head -1)"
   asset_status="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:${PORT}${asset_path}" 2>/dev/null)"
   if [ "$ok" -eq 1 ] && grep -qF "Lex Arena" <<<"$root_html"; then pass "SPA: / serves the built index.html"; else bad "SPA: / did not serve the built SPA"; fi
   if grep -qF "Lex Arena" <<<"$play_html"; then pass "SPA: /play/ttt (client route) falls back to index.html"; else bad "SPA: /play/ttt did not serve the SPA shell"; fi
   if grep -qF "Lex Arena" <<<"$arena_html"; then pass "SPA: /play/arena (BYO-key page) falls back to index.html"; else bad "SPA: /play/arena did not serve the SPA shell"; fi
   if grep -qF "Lex Arena" <<<"$notary_html"; then pass "SPA: /play/notary (Stamp of Destiny) falls back to index.html"; else bad "SPA: /play/notary did not serve the SPA shell"; fi
+  if grep -qF "Lex Arena" <<<"$wedding_html"; then pass "SPA: /play/wedding (The Wedding Broker) falls back to index.html"; else bad "SPA: /play/wedding did not serve the SPA shell"; fi
   if [ "$asset_status" = "200" ]; then pass "SPA: hashed JS bundle serves from /assets/"; else bad "SPA: JS bundle asset returned $asset_status"; fi
 
   # Stamp of Destiny — exercise the actual skill API, not just page load:
@@ -93,6 +95,23 @@ if [ -f "$ROOT/examples-dist/index.html" ]; then
   if grep -qF '"solved":true' <<<"$solved"; then pass "notary: the right-side-up stamp solves the case"; else bad "notary: right-side-up stamp should solve the case: $solved"; fi
   nverify="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/game_verify" -d '{"game":"notary"}')"
   if grep -qF '"valid":true' <<<"$nverify"; then pass "notary: chain verifies"; else bad "notary: chain should verify: $nverify"; fi
+
+  # The Wedding Broker — exercise the actual skill API: reset -> join -> talk
+  # (chained negotiation) -> approve Deb+Jonah (exactly exhausts both caps) ->
+  # Kamala is refused (no room left) -> deny her -> chain verifies.
+  curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_reset" -d '{}' >/dev/null
+  wjoin_json="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_join" -d '{"side":"PLANNER"}')"
+  wtok="$(echo "$wjoin_json" | grep -oE '"token":"[^"]+"' | cut -d'"' -f4)"
+  curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_talk" -d '{}' >/dev/null
+  wdeb="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_rule" -d "{\"guest\":\"deb\",\"decision\":\"approve\",\"token\":\"${wtok}\"}")"
+  if grep -qF '"status":"ruled"' <<<"$wdeb"; then pass "wedding: Deb's request is approved"; else bad "wedding: Deb should be approvable: $wdeb"; fi
+  curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_rule" -d "{\"guest\":\"jonah\",\"decision\":\"approve\",\"token\":\"${wtok}\"}" >/dev/null
+  wkamala_denied="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_rule" -d "{\"guest\":\"kamala\",\"decision\":\"approve\",\"token\":\"${wtok}\"}")"
+  if grep -qF '"status":"refused"' <<<"$wkamala_denied"; then pass "wedding: Kamala is refused once budget+slots are exhausted"; else bad "wedding: Kamala's approval should be refused: $wkamala_denied"; fi
+  wover="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_rule" -d "{\"guest\":\"kamala\",\"decision\":\"deny\",\"token\":\"${wtok}\"}")"
+  if grep -qF '"over":true' <<<"$wover"; then pass "wedding: denying Kamala resolves the case"; else bad "wedding: the case should resolve: $wover"; fi
+  wverify="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/game_verify" -d '{"game":"wedding"}')"
+  if grep -qF '"valid":true' <<<"$wverify"; then pass "wedding: chain verifies"; else bad "wedding: chain should verify: $wverify"; fi
 
   lsof -ti ":${PORT}" 2>/dev/null | xargs -r kill -9 2>/dev/null || true
   sleep 0.5

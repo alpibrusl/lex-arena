@@ -27,6 +27,8 @@
   --color-blue: #5eb8ff;
   --color-pink: #ff7ac6;
   --color-violet: #b98aff;
+  --color-blush: #f4c6d4;
+  --color-gold: #e8c874;
 
   --shadow-card: 0 1px 2px rgba(0,0,0,.3), 0 0 0 1px rgba(255,255,255,.02) inset;
   --shadow-lift: 0 12px 32px -8px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.03) inset;
@@ -54,3 +56,19 @@ code, .font-data { font-family: var(--font-mono); }
   100% { transform: translate(-50%, -50%) translateY(0) rotate(-8deg) scale(1); opacity: 1; }
 }
 .animate-stamp-slam { animation: stamp-slam 550ms cubic-bezier(.2,.8,.3,1) both; }
+
+/* The Wedding Broker — a chat bubble pops in after its "typing…" beat, and
+ * three dots bounce while a guest is "composing" their line. Makes the
+ * negotiation feel like watching a live group chat, not reading a status
+ * paragraph. */
+@keyframes bubble-in {
+  0%   { transform: translateY(6px) scale(.96); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+.animate-bubble-in { animation: bubble-in 260ms cubic-bezier(.2,.8,.3,1) both; }
+
+@keyframes typing-dot {
+  0%, 60%, 100% { transform: translateY(0); opacity: .5; }
+  30% { transform: translateY(-3px); opacity: 1; }
+}
+.animate-typing-dot { animation: typing-dot 1s ease-in-out infinite; }

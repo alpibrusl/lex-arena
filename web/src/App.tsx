@@ -7,6 +7,7 @@ import { ChargerDuel } from './pages/ChargerDuel'
 import { HeistCoop } from './pages/HeistCoop'
 import { StrategyFootball } from './pages/StrategyFootball'
 import { Notary } from './pages/Notary'
+import { Wedding } from './pages/Wedding'
 import { Arena } from './pages/Arena'
 
 export default function App() {
@@ -21,6 +22,7 @@ export default function App() {
         <Route path="/play/heist" element={<HeistCoop />} />
         <Route path="/play/football" element={<StrategyFootball />} />
         <Route path="/play/notary" element={<Notary />} />
+        <Route path="/play/wedding" element={<Wedding />} />
         <Route path="/play/arena" element={<Arena />} />
       </Routes>
     </BrowserRouter>
