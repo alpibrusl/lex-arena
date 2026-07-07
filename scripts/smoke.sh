@@ -192,6 +192,12 @@ if [ -f "$ROOT/examples-dist/index.html" ]; then
   if grep -qF '"status":"refused"' <<<"$wwadvise_empty"; then pass "werewolf: the advisor refuses an empty question"; else bad "werewolf: advisor should refuse empty input: $wwadvise_empty"; fi
   wwverify="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/game_verify" -d '{"game":"ww"}')"
   if grep -qF '"valid":true' <<<"$wwverify"; then pass "werewolf: chain verifies after advising (advisor is off-trail)"; else bad "werewolf: chain should verify: $wwverify"; fi
+  # Post-game reveal: whether the single lynch above happened to end the game
+  # (wolf seat is randomized per round, so this isn't deterministic in CI) or
+  # not, ww_reveal must respond cleanly either way — refused mid-game, or a
+  # reveals array once over.
+  wwreveal="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/ww_reveal" -d '{}')"
+  if grep -qE '"status":"refused"|"reveals"' <<<"$wwreveal"; then pass "werewolf: ww_reveal responds correctly whether or not the game has ended"; else bad "werewolf: ww_reveal gave an unexpected response: $wwreveal"; fi
 
   lsof -ti ":${PORT}" 2>/dev/null | xargs -r kill -9 2>/dev/null || true
   sleep 0.5

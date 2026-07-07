@@ -19,6 +19,9 @@ export function Werewolf() {
   const [advisorLog, setAdvisorLog] = useState<{ q: string; a: string }[]>([])
   const [adviseText, setAdviseText] = useState('')
   const [advising, setAdvising] = useState(false)
+  // Post-game confessions: each AI seat reveals, in hindsight, how it played.
+  const [reveals, setReveals] = useState<{ seat: number; name: string; role: string; won: boolean; text: string }[] | null>(null)
+  const [revealing, setRevealing] = useState(false)
   const tokenRef = useRef('')
   const seenLogLen = useRef(0)
 
@@ -31,6 +34,7 @@ export function Werewolf() {
     setVerdict('')
     setAdvisorLog([])
     setAdviseText('')
+    setReveals(null)
     seenLogLen.current = 0
     const j = await callSkill<{ token?: string }>('ww_new')
     if (j?.token) tokenRef.current = j.token
@@ -103,6 +107,14 @@ export function Werewolf() {
     })
     setAdvising(false)
   }, [adviseText, advising])
+
+  const doReveal = useCallback(async () => {
+    if (revealing) return
+    setRevealing(true)
+    const r = await callSkill<{ reveals?: any[] }>('ww_reveal')
+    setReveals(r?.reveals ?? [])
+    setRevealing(false)
+  }, [revealing])
 
   const onVerify = useCallback(async () => {
     const v = await verifyChain('ww') // matches the g_record/g_match prefix used server-side, not the lex-games verifier's registered name ("werewolf")
@@ -249,11 +261,37 @@ export function Werewolf() {
         )}
 
         {over && (
-          <div className="w-full max-w-3xl rounded-xl border border-[var(--color-violet)] bg-surface-hi p-4 text-center">
-            <div className="mb-1 text-[11px] font-bold tracking-wide text-violet">GAME OVER</div>
-            <div className="text-base font-bold text-ink">
-              {winner === 'town' ? '🌾 The town caught the wolf!' : '🐺 The wolf fooled the whole village.'}
+          <div className="flex w-full max-w-3xl flex-col gap-3">
+            <div className="rounded-xl border border-[var(--color-violet)] bg-surface-hi p-4 text-center">
+              <div className="mb-1 text-[11px] font-bold tracking-wide text-violet">GAME OVER</div>
+              <div className="text-base font-bold text-ink">
+                {winner === 'town' ? '🌾 The town caught the wolf!' : '🐺 The wolf fooled the whole village.'}
+              </div>
             </div>
+
+            {/* the payoff: each AI seat confesses how it actually played */}
+            {reveals === null ? (
+              <Button variant="primary" disabled={revealing} onClick={doReveal}>
+                {revealing ? 'They’re owning up…' : '🎭 How did they really play?'}
+              </Button>
+            ) : (
+              <div className="flex flex-col gap-2 rounded-xl border border-border bg-surface-hi p-3">
+                <div className="text-xs font-bold text-muted">THE CONFESSIONS — how each agent really played</div>
+                {reveals.map((r) => (
+                  <div key={r.seat} className="flex items-start gap-2 animate-bubble-in">
+                    <PlayerPortrait seat={r.seat} mood="alive" role={r.role} className="h-9 w-9 shrink-0 rounded-full" />
+                    <div className="flex flex-col gap-1 rounded-2xl rounded-tl-sm border border-border bg-surface px-3 py-1.5">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[11px] font-bold text-ink">{r.name}</span>
+                        <RoleBadge role={r.role} className="!text-[9px]" />
+                        <span className={'text-[9px] font-bold ' + (r.won ? 'text-green' : 'text-faint')}>{r.won ? 'won' : 'lost'}</span>
+                      </div>
+                      <div className="text-sm text-ink">{r.text}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
