@@ -165,6 +165,27 @@ if [ -f "$ROOT/examples-dist/index.html" ]; then
   vsecond="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/wedding_rule" -d "{\"guest\":\"jonah\",\"decision\":\"approve\",\"token\":\"${vt2}\"}")"
   if grep -qF '"status":"refused"' <<<"$vsecond"; then pass "wedding: at the society wedding you can please only one — a 2nd approval is refused"; else bad "wedding: 2nd approve should be refused at 1 slot: $vsecond"; fi
 
+  # Werewolf — exercise the actual skill API: roles are sealed to the trail
+  # before a single turn is played, night resolves (villager auto-passes),
+  # discussion has every living AI speak, a vote lynches by plurality, and the
+  # chain verifies with roles-committed as the first entry.
+  werewolf_html="$(curl -sf "http://127.0.0.1:${PORT}/play/werewolf" 2>/dev/null)"
+  if grep -qF "Lex Arena" <<<"$werewolf_html"; then pass "SPA: /play/werewolf falls back to index.html"; else bad "SPA: /play/werewolf did not serve the SPA shell"; fi
+  wwjoin="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/ww_new" -d '{}')"
+  wwtok="$(echo "$wwjoin" | grep -oE '"token":"[^"]+"' | cut -d'"' -f4)"
+  if [ -n "$wwtok" ]; then pass "werewolf: a fresh game issues a seat token"; else bad "werewolf: ww_new should issue a token: $wwjoin"; fi
+  wwstate0="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/ww_state" -d '{}')"
+  if grep -qF '"phase":"night"' <<<"$wwstate0"; then pass "werewolf: a new game starts at night"; else bad "werewolf: new game should start at night: $wwstate0"; fi
+  wwnight="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/ww_night" -d "{\"target\":-1,\"token\":\"${wwtok}\"}")"
+  if grep -qF '"status":"ok"' <<<"$wwnight"; then pass "werewolf: night resolves"; else bad "werewolf: night should resolve: $wwnight"; fi
+  wwdiscuss="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/ww_discuss" -d '{"text":"anyone acting strange?"}')"
+  if grep -qF '"phase":"vote"' <<<"$wwdiscuss"; then pass "werewolf: discussion advances to a vote"; else bad "werewolf: discussion should reach vote phase: $wwdiscuss"; fi
+  wwtarget="$(echo "$wwdiscuss" | python3 -c "import sys,json; d=json.load(sys.stdin); print(next(p['seat'] for p in d['players'] if p['alive'] and not p['you']))" 2>/dev/null)"
+  wwvote="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/ww_vote" -d "{\"target\":${wwtarget:-1}}")"
+  if grep -qE '"lynched":[0-9]' <<<"$wwvote"; then pass "werewolf: the vote lynches a plurality target"; else bad "werewolf: vote should lynch someone: $wwvote"; fi
+  wwverify="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/game_verify" -d '{"game":"ww"}')"
+  if grep -qF '"valid":true' <<<"$wwverify"; then pass "werewolf: chain verifies (roles sealed before play)"; else bad "werewolf: chain should verify: $wwverify"; fi
+
   lsof -ti ":${PORT}" 2>/dev/null | xargs -r kill -9 2>/dev/null || true
   sleep 0.5
 else
