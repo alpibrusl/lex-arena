@@ -14,6 +14,11 @@ export function Werewolf() {
   const [busy, setBusy] = useState(false)
   const [speakText, setSpeakText] = useState('')
   const [verdict, setVerdict] = useState('')
+  // The player's private advisor — a strategy sounding board, not one of the
+  // five seats. It sees only what you see, so it can't leak hidden roles.
+  const [advisorLog, setAdvisorLog] = useState<{ q: string; a: string }[]>([])
+  const [adviseText, setAdviseText] = useState('')
+  const [advising, setAdvising] = useState(false)
   const tokenRef = useRef('')
   const seenLogLen = useRef(0)
 
@@ -24,6 +29,8 @@ export function Werewolf() {
     setVisibleLog([])
     setTyping(null)
     setVerdict('')
+    setAdvisorLog([])
+    setAdviseText('')
     seenLogLen.current = 0
     const j = await callSkill<{ token?: string }>('ww_new')
     if (j?.token) tokenRef.current = j.token
@@ -81,6 +88,21 @@ export function Werewolf() {
     },
     [revealNewLog],
   )
+
+  const doAdvise = useCallback(async () => {
+    const q = adviseText.trim()
+    if (!q || advising) return
+    setAdvising(true)
+    setAdviseText('')
+    setAdvisorLog((prev) => [...prev, { q, a: '' }])
+    const r = await callSkill<{ answer?: string }>('ww_advise', { text: q })
+    setAdvisorLog((prev) => {
+      const next = [...prev]
+      next[next.length - 1] = { q, a: r?.answer ?? "I couldn't think of anything useful just now — try asking again." }
+      return next
+    })
+    setAdvising(false)
+  }, [adviseText, advising])
 
   const onVerify = useCallback(async () => {
     const v = await verifyChain('ww') // matches the g_record/g_match prefix used server-side, not the lex-games verifier's registered name ("werewolf")
@@ -231,6 +253,48 @@ export function Werewolf() {
             <div className="mb-1 text-[11px] font-bold tracking-wide text-violet">GAME OVER</div>
             <div className="text-base font-bold text-ink">
               {winner === 'town' ? '🌾 The town caught the wolf!' : '🐺 The wolf fooled the whole village.'}
+            </div>
+          </div>
+        )}
+
+        {/* private advisor — your own agent, separate from the five seats */}
+        {!over && (
+          <div className="flex w-full max-w-3xl flex-col gap-2 rounded-xl border border-violet/40 bg-violet/5 p-3">
+            <div className="flex items-center gap-2 text-xs font-bold text-violet">
+              <span className="grid h-6 w-6 place-items-center rounded-full bg-violet/20">🧠</span>
+              Your advisor
+              <span className="font-normal text-faint">— private. Sees only what you see. Talk strategy before you act.</span>
+            </div>
+
+            {advisorLog.length > 0 && (
+              <div className="flex flex-col gap-2">
+                {advisorLog.map((m, i) => (
+                  <div key={i} className="flex flex-col gap-1">
+                    <div className="self-end rounded-2xl rounded-tr-sm bg-surface px-3 py-1.5 text-sm text-ink">{m.q}</div>
+                    <div className="animate-bubble-in self-start rounded-2xl rounded-tl-sm border border-violet/30 bg-surface-hi px-3 py-1.5 text-sm text-ink">
+                      {m.a ? m.a : <span className="inline-flex items-center gap-1 text-muted">
+                        thinking
+                        <span className="h-1.5 w-1.5 animate-typing-dot rounded-full bg-violet [animation-delay:0ms]" />
+                        <span className="h-1.5 w-1.5 animate-typing-dot rounded-full bg-violet [animation-delay:150ms]" />
+                        <span className="h-1.5 w-1.5 animate-typing-dot rounded-full bg-violet [animation-delay:300ms]" />
+                      </span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="flex w-full gap-2">
+              <input
+                value={adviseText}
+                onChange={(e) => setAdviseText(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') doAdvise() }}
+                placeholder={advisorLog.length ? 'Ask a follow-up…' : 'e.g. Who seems most suspicious, and what should I say?'}
+                className="flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-ink placeholder:text-faint focus:border-violet focus:outline-none"
+              />
+              <Button disabled={advising || !adviseText.trim()} onClick={doAdvise}>
+                {advising ? 'Thinking…' : 'Ask'}
+              </Button>
             </div>
           </div>
         )}

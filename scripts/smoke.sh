@@ -183,8 +183,15 @@ if [ -f "$ROOT/examples-dist/index.html" ]; then
   wwtarget="$(echo "$wwdiscuss" | python3 -c "import sys,json; d=json.load(sys.stdin); print(next(p['seat'] for p in d['players'] if p['alive'] and not p['you']))" 2>/dev/null)"
   wwvote="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/ww_vote" -d "{\"target\":${wwtarget:-1}}")"
   if grep -qE '"lynched":[0-9]' <<<"$wwvote"; then pass "werewolf: the vote lynches a plurality target"; else bad "werewolf: vote should lynch someone: $wwvote"; fi
+  # The player's private advisor answers (static fallback with no LLM) and,
+  # crucially, is NOT recorded to the trail — so the chain still verifies after
+  # asking it.
+  wwadvise="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/ww_advise" -d '{"text":"who seems suspicious?"}')"
+  if grep -qF '"answer"' <<<"$wwadvise"; then pass "werewolf: the private advisor answers a strategy question"; else bad "werewolf: advisor should answer: $wwadvise"; fi
+  wwadvise_empty="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/ww_advise" -d '{"text":""}')"
+  if grep -qF '"status":"refused"' <<<"$wwadvise_empty"; then pass "werewolf: the advisor refuses an empty question"; else bad "werewolf: advisor should refuse empty input: $wwadvise_empty"; fi
   wwverify="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/game_verify" -d '{"game":"ww"}')"
-  if grep -qF '"valid":true' <<<"$wwverify"; then pass "werewolf: chain verifies (roles sealed before play)"; else bad "werewolf: chain should verify: $wwverify"; fi
+  if grep -qF '"valid":true' <<<"$wwverify"; then pass "werewolf: chain verifies after advising (advisor is off-trail)"; else bad "werewolf: chain should verify: $wwverify"; fi
 
   lsof -ti ":${PORT}" 2>/dev/null | xargs -r kill -9 2>/dev/null || true
   sleep 0.5
