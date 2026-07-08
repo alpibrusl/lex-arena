@@ -176,8 +176,13 @@ if [ -f "$ROOT/examples-dist/index.html" ]; then
   if [ -n "$wwtok" ]; then pass "werewolf: a fresh game issues a seat token"; else bad "werewolf: ww_new should issue a token: $wwjoin"; fi
   wwstate0="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/ww_state" -d '{}')"
   if grep -qF '"phase":"night"' <<<"$wwstate0"; then pass "werewolf: a new game starts at night"; else bad "werewolf: new game should start at night: $wwstate0"; fi
-  wwnight="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/ww_night" -d "{\"target\":-1,\"token\":\"${wwtok}\"}")"
-  if grep -qF '"status":"ok"' <<<"$wwnight"; then pass "werewolf: night resolves"; else bad "werewolf: night should resolve: $wwnight"; fi
+  # The human's role is randomized per game (lex-robot#94) — seer/doctor need
+  # an actual living target (seat 1 always qualifies at game start), everyone
+  # else passes -1. Role-aware so this doesn't flake ~1-in-4 runs.
+  wwrole0="$(echo "$wwstate0" | python3 -c "import sys,json; print(json.load(sys.stdin)['you']['role'])" 2>/dev/null)"
+  wwnighttarget=-1; if [ "$wwrole0" = "seer" ] || [ "$wwrole0" = "doctor" ]; then wwnighttarget=1; fi
+  wwnight="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/ww_night" -d "{\"target\":${wwnighttarget},\"token\":\"${wwtok}\"}")"
+  if grep -qF '"status":"ok"' <<<"$wwnight"; then pass "werewolf: night resolves ($wwrole0)"; else bad "werewolf: night should resolve: $wwnight"; fi
   wwdiscuss="$(curl -s -X POST "http://127.0.0.1:${PORT}/skill/ww_discuss" -d '{"text":"anyone acting strange?"}')"
   if grep -qF '"phase":"vote"' <<<"$wwdiscuss"; then pass "werewolf: discussion advances to a vote"; else bad "werewolf: discussion should reach vote phase: $wwdiscuss"; fi
   wwtarget="$(echo "$wwdiscuss" | python3 -c "import sys,json; d=json.load(sys.stdin); print(next(p['seat'] for p in d['players'] if p['alive'] and not p['you']))" 2>/dev/null)"
