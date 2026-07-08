@@ -79,7 +79,7 @@ export const GAMES: GameMeta[] = [
     id: 'werewolf',
     icon: '🐺',
     title: 'Werewolf',
-    desc: "Five seats, one wolf among them — and it's a real AI agent, genuinely lying to your face. Roles are sealed to the hash-chained trail before anyone plays a turn, so the game is provably fair. Find the wolf before it finds you.",
+    desc: "Eight seats, one wolf among them — and it's a real AI agent, genuinely lying to your face. Roles are sealed to the hash-chained trail before anyone plays a turn, so the game is provably fair. Find the wolf before it finds you.",
     tags: ['1-player', 'social deduction', 'multi-agent'],
     path: '/play/werewolf',
   },

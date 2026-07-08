@@ -144,7 +144,7 @@ export function Werewolf() {
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden">
-      <Header meta="five seats, one wolf among them · the roles are sealed before anyone plays a single turn · every action is capability-gated" back live={live} />
+      <Header meta="eight seats, one wolf among them · the roles are sealed before anyone plays a single turn · every action is capability-gated" back live={live} />
       <div className="flex flex-1 min-h-0 flex-col items-center gap-4 overflow-y-auto p-4">
         <VillageScene night={phase === 'night'} className="h-[76px] w-full max-w-3xl rounded-xl border border-border" />
 
@@ -168,7 +168,7 @@ export function Werewolf() {
         )}
 
         {/* player roster */}
-        <div className="grid w-full max-w-3xl grid-cols-5 gap-2">
+        <div className="grid w-full max-w-3xl grid-cols-4 gap-2">
           {players.map((p) => (
             <div key={p.seat} className="flex flex-col items-center gap-1 rounded-lg border border-border bg-surface-hi p-2 text-center">
               <PlayerPortrait seat={p.seat} mood={p.you ? 'you' : p.alive ? 'alive' : 'dead'} role={p.role} className="h-11 w-11 rounded-full" />
@@ -216,6 +216,18 @@ export function Werewolf() {
               <>
                 <div className="text-sm text-ink">Choose someone to secretly inspect:</div>
                 <div className="flex flex-wrap justify-center gap-2">
+                  {livingOthers.map((p) => (
+                    <Button key={p.seat} disabled={busy} onClick={() => doNight(p.seat)}>
+                      {p.name}
+                    </Button>
+                  ))}
+                </div>
+              </>
+            ) : you.needs_night && you.role === 'doctor' ? (
+              <>
+                <div className="text-sm text-ink">Choose someone to protect tonight — you may protect yourself:</div>
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Button disabled={busy} onClick={() => doNight(0)}>Myself</Button>
                   {livingOthers.map((p) => (
                     <Button key={p.seat} disabled={busy} onClick={() => doNight(p.seat)}>
                       {p.name}

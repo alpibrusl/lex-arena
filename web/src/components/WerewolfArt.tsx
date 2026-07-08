@@ -43,17 +43,21 @@ export function VillageScene({ night = true, className = '' }: { night?: boolean
   )
 }
 
-const HAIR: Record<number, string> = { 0: '#4a3a2a', 1: '#6b3a4a', 2: '#3a5a4a', 3: '#5a4a2a', 4: '#3a4a6b' }
+const HAIR: Record<number, string> = {
+  0: '#4a3a2a', 1: '#6b3a4a', 2: '#3a5a4a', 3: '#5a4a2a', 4: '#3a4a6b', 5: '#6b5a2a', 6: '#2a4a4a', 7: '#5a2a4a',
+}
 
 export function PlayerPortrait({ seat, mood = 'alive', role = '', className = '' }: { seat: number; mood?: PlayerMood; role?: string; className?: string }) {
   const hair = HAIR[seat] ?? '#4a3a2a'
   const dead = mood === 'dead'
   const wolf = role === 'wolf'
   const seer = role === 'seer'
+  const doctor = role === 'doctor'
+  const scarf = wolf ? '#7a2a2a' : seer ? '#5a3a7a' : doctor ? '#2a6a5a' : '#2a3a5a'
   return (
     <svg viewBox="0 0 64 64" className={className} role="presentation" style={dead ? { filter: 'grayscale(1)' } : undefined}>
       <circle cx="32" cy="32" r="32" fill={mood === 'you' ? '#1a2b3a' : '#1a1a24'} opacity={dead ? 0.55 : 1} />
-      <path d="M16 62 Q32 50 48 62 Z" fill={wolf ? '#7a2a2a' : seer ? '#5a3a7a' : '#2a3a5a'} opacity={dead ? 0.4 : 0.9} />
+      <path d="M16 62 Q32 50 48 62 Z" fill={scarf} opacity={dead ? 0.4 : 0.9} />
       <ellipse cx="32" cy="30" rx="15" ry="16" fill="#dba876" opacity={dead ? 0.5 : 1} />
       <path d="M15 24 Q16 8 32 8 Q48 8 49 24 Q49 15 32 15 Q15 15 15 24 Z" fill={hair} opacity={dead ? 0.5 : 1} />
       {dead ? (
@@ -77,6 +81,7 @@ export function RoleBadge({ role, className = '' }: { role: string; className?: 
   const info: Record<string, { icon: string; color: string; label: string }> = {
     wolf: { icon: '🐺', color: 'var(--color-red)', label: 'Werewolf' },
     seer: { icon: '🔮', color: 'var(--color-violet)', label: 'Seer' },
+    doctor: { icon: '🩺', color: 'var(--color-blue)', label: 'Doctor' },
     villager: { icon: '🌾', color: 'var(--color-green)', label: 'Villager' },
   }
   const i = info[role] || { icon: '❓', color: 'var(--color-muted)', label: role || '?' }
