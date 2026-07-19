@@ -18,7 +18,7 @@ jobs:
   smoke:
     runs-on: ubuntu-latest
     env:
-      LEX_VERSION: v0.10.0
+      LEX_VERSION: v0.10.6
     steps:
       - uses: actions/checkout@v4
 
