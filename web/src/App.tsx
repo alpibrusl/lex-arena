@@ -10,6 +10,7 @@ import { Notary } from './pages/Notary'
 import { Wedding } from './pages/Wedding'
 import { Werewolf } from './pages/Werewolf'
 import { Arena } from './pages/Arena'
+import { Stable } from './pages/Stable'
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="/play/wedding" element={<Wedding />} />
         <Route path="/play/werewolf" element={<Werewolf />} />
         <Route path="/play/arena" element={<Arena />} />
+        <Route path="/manage/stable" element={<Stable />} />
       </Routes>
     </BrowserRouter>
   )
