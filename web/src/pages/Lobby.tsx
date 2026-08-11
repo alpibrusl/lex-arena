@@ -50,6 +50,18 @@ export function Lobby() {
               — paste a system prompt + API key, it plays Bazaar Draft for you.
             </p>
           </Card>
+          <Card className="flex-1 basis-80">
+            <div className="text-[11px] font-semibold tracking-wide text-violet">③ MANAGE A STABLE · OPTIONAL</div>
+            <div className="mt-2 text-base font-medium">📈 Train an agent, async</div>
+            <p className="mt-1 text-sm leading-relaxed text-muted">
+              No live match to watch — your stable earns a budget over real elapsed time between visits and
+              reinvests it into automation. Check back later for a "while you were away" summary, then{' '}
+              <Link to="/manage/stable" className="text-violet hover:underline">
+                open your stable ↗
+              </Link>
+              .
+            </p>
+          </Card>
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
