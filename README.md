@@ -222,3 +222,9 @@ shared box behind `play.lexlang.org`.
 - The deploy pipeline's automated box rollout (SSH + `docker compose up`) isn't
   wired into CI yet — `arena-live.yml` builds and pushes the image; the deploy
   step is a manual follow-up, same as `loom-cloud`'s pattern.
+
+## License
+
+Copyright (c) 2026 lex-arena contributors.
+
+Licensed under the [EUPL-1.2](LICENSE) — the European Union Public Licence, as used across the `lex-*` ecosystem.
