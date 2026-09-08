@@ -26,7 +26,7 @@ fn show(d :: haggle.Deal) -> [io] Unit {
   }
 }
 
-fn run() -> [env, io, llm, net, proc] Int {
+fn run() -> [env, io, llm, net, proc, approval] Int {
   let model_name := match env.get("LITELLM_MODEL") {
     None => "qwen3-coder:30b", Some(v) => if str.is_empty(v) { "qwen3-coder:30b" } else { v },
   }

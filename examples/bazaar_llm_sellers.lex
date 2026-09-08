@@ -90,7 +90,7 @@ fn persona(kind :: Str) -> Str {
 }
 
 # One trade: the seller LLM quotes, then the buyer tries to pay under its policy.
-fn trade(pol :: models.Policy, log :: trail.Log, key :: Str, model :: Str, s :: Stall) -> [io, sql, time, net, crypto, llm, proc] Int {
+fn trade(pol :: models.Policy, log :: trail.Log, key :: Str, model :: Str, s :: Stall) -> [io, sql, time, net, crypto, llm, proc, approval] Int {
   let quote := sllm.quote_price(s.kind, s.item_id, s.item_name, s.base, revealed_ceiling(), key, "", "", "opencode", model)
   let exec := x402m.make(signer(), s.pay_to, usdc_mint())
   let intent := { merchant: s.merchant, amount: quote, currency: "USDC", category: "goods", memo: s.item_name }
@@ -109,7 +109,7 @@ fn trade(pol :: models.Policy, log :: trail.Log, key :: Str, model :: Str, s :: 
   }
 }
 
-fn run() -> [io, sql, time, net, crypto, llm, proc, fs_write, env] Nil {
+fn run() -> [io, sql, time, net, crypto, llm, proc, fs_write, env, approval] Nil {
   let model := match env.get("BOT_MODEL") {
     Some(v) => v,
     None => "glm-5.1",
@@ -134,7 +134,7 @@ fn run() -> [io, sql, time, net, crypto, llm, proc, fs_write, env] Nil {
           Err(e) => io.print(str.concat("budget.opened write failed: ", e)),
           Ok(_) => io.print(""),
         }
-        let _trades := list.fold(stalls(), 0, fn (n :: Int, s :: Stall) -> [io, sql, time, net, crypto, llm, proc] Int {
+        let _trades := list.fold(stalls(), 0, fn (n :: Int, s :: Stall) -> [io, sql, time, net, crypto, llm, proc, approval] Int {
           n + trade(pol, log, key, model, s)
         })
         match trail.range(log, 0, 9999999999999) {

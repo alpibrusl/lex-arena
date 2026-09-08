@@ -12,7 +12,7 @@ cd "$ROOT"
 PORT="${LEX_ROBOT_SIDECAR_PORT:-8900}"
 LEX_ROBOT_PKG="${LEX_ROBOT_PKG:-$HOME/.lex/packages/lex-robot}"
 SIDECAR="$LEX_ROBOT_PKG/sidecar/sim_sidecar.lex"
-EFF="concurrent,crypto,env,fs_read,fs_write,io,llm,net,proc,random,sense,sql,time"
+EFF="approval,concurrent,crypto,env,fs_read,fs_write,io,llm,net,proc,random,sense,sql,stream,time"
 fail=0
 pass() { printf "  \033[32mPASS\033[0m %s\n" "$1"; }
 bad()  { printf "  \033[31mFAIL\033[0m %s\n" "$1"; fail=1; }

@@ -23,7 +23,7 @@ fi
 
 echo "== quote + gate: $MODEL sellers price; the buyer's token decides =="
 BOT_MODEL="$MODEL" BAZAAR_TRAIL="$TRAIL" OPENCODE_API_KEY="$OPENCODE_API_KEY" \
-  $LEX run --allow-effects crypto,env,fs_write,io,llm,net,proc,sql,time "$HERE/bazaar_llm_sellers.lex" run \
+  $LEX run --allow-effects crypto,env,fs_write,io,llm,net,proc,sql,time,approval,stream "$HERE/bazaar_llm_sellers.lex" run \
   | grep -vE "seller LLM\]"
 
 echo

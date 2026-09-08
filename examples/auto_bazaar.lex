@@ -444,7 +444,7 @@ fn parse_goal(ans :: Str, dflt_budget :: Int) -> (Str, Int) {
 
 # ── Entry point ───────────────────────────────────────────────────────────────
 
-fn run() -> [env, net, io, llm, time, proc] Unit {
+fn run() -> [env, net, io, llm, time, proc, approval] Unit {
   let base_url := match env.get("SIDECAR_URL") { None => "http://localhost:8900", Some(u) => u }
   let env_budget := match env.get("AUTO_BUDGET") { None => 50, Some(v) => match str.to_int(v) { Some(n) => n, None => 50 } }
   # The GOAL is provided by the human, not hardcoded: if AUTO_ITEMS is set (a

@@ -180,7 +180,7 @@ fn llm_audit_run(blob :: boot.BootstrapBlob, policy :: { allowed_pubkeys :: List
 }
 
 # ── Customer entry point ───────────────────────────────────────────────────────
-fn run() -> [net, io, sql, fs_write, sense, time, env, llm, proc] Unit {
+fn run() -> [net, io, sql, fs_write, sense, time, env, llm, proc, approval] Unit {
   let search := "Bowl"
   let budget := 15
   let trail_path := "/tmp/lex-bazaar-demo.db"
@@ -223,7 +223,7 @@ fn run() -> [net, io, sql, fs_write, sense, time, env, llm, proc] Unit {
                       let __sl := io.print("──────────────────────────────────────────────────────")
                       let __slsetup := time.sleep_ms(1500)
                       let init := { purchase: None, parent: root.id, used: [] }
-                      let final_state := list.fold(stalls, init, fn (state :: baz.ShopState, stall :: baz.StallInfo) -> [net, sql, time, llm, io, proc] baz.ShopState {
+                      let final_state := list.fold(stalls, init, fn (state :: baz.ShopState, stall :: baz.StallInfo) -> [net, sql, time, llm, io, proc, approval] baz.ShopState {
                         match state.purchase {
                           Some(_) => state,
                           None => {

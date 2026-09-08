@@ -22,7 +22,7 @@ import "std.int" as int
 
 import "lex-robot/src/seller_llm" as sllm
 
-fn run() -> [env, io, llm, net, proc] Int {
+fn run() -> [env, io, llm, net, proc, approval] Int {
   let base := match env.get("LITELLM_BASE_URL") {
     None    => "http://localhost:4000",
     Some(v) => if str.is_empty(v) { "http://localhost:4000" } else { v },

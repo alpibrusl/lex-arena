@@ -12,7 +12,7 @@
 [package]
 name    = "lex-arena"
 version = "0.1.0"
-lex     = "0.10.0"
+lex     = "0.10.18"
 license = "EUPL-1.2"
 description = "lex-arena live game referee (deploy image)"
 

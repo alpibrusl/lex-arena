@@ -18,7 +18,7 @@ RUN npm run build
 
 FROM ubuntu:24.04
 
-ARG LEX_VERSION=0.10.0
+ARG LEX_VERSION=0.10.18
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl git ca-certificates tar python3 \
@@ -63,4 +63,4 @@ ENV LEX_ROBOT_SIDECAR_PORT=8900 \
 
 # The dashboard/referee: serves the SPA + the legacy game dashboards + hosts
 # every game's skills + SSE.
-CMD ["sh","-c","lex run --allow-effects concurrent,crypto,env,fs_read,fs_write,io,llm,net,proc,random,sql,time --allow-proc sh /root/.lex/packages/lex-robot/sidecar/sim_sidecar.lex run"]
+CMD ["sh","-c","lex run --allow-effects concurrent,crypto,env,fs_read,fs_write,io,llm,net,proc,random,sql,time,approval,stream --allow-proc sh /root/.lex/packages/lex-robot/sidecar/sim_sidecar.lex run"]

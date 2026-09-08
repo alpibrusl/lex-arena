@@ -95,8 +95,8 @@ fn intent_for(s :: Stall) -> models.SpendIntent {
 }
 
 # ── quote phase: each seller LLM prices its own item ─────────────────────────
-fn quote_all(key :: Str, model :: Str, stalls :: List[Stall]) -> [io, llm, net, proc] List[Stall] {
-  list.map(stalls, fn (s :: Stall) -> [io, llm, net, proc] Stall {
+fn quote_all(key :: Str, model :: Str, stalls :: List[Stall]) -> [io, llm, net, proc, approval] List[Stall] {
+  list.map(stalls, fn (s :: Stall) -> [io, llm, net, proc, approval] Stall {
     let q := sllm.quote_price(s.kind, s.item, s.item, s.base, revealed_ceiling(), key, "", "", "opencode", model)
     { kind: s.kind, merchant: s.merchant, pay_to: s.pay_to, item: s.item, base: s.base, value: s.value, price: q }
   })
@@ -201,7 +201,7 @@ fn short_reason(r :: Str) -> Str {
 }
 
 # ── the buyer's shopping loop ────────────────────────────────────────────────
-fn shop(pol :: models.Policy, log :: trail.Log, agent :: llm_agent.AgentLoop, cat :: List[Stall], owned :: List[Bool], spent :: Int, history :: Str, turn :: Int, maxt :: Int) -> [io, sql, time, net, crypto, llm, proc, fs_write] Nil {
+fn shop(pol :: models.Policy, log :: trail.Log, agent :: llm_agent.AgentLoop, cat :: List[Stall], owned :: List[Bool], spent :: Int, history :: Str, turn :: Int, maxt :: Int) -> [io, sql, time, net, crypto, llm, proc, fs_write, approval] Nil {
   if turn >= maxt {
     io.print("  (turn limit reached)")
   } else {
@@ -230,7 +230,7 @@ fn shop(pol :: models.Policy, log :: trail.Log, agent :: llm_agent.AgentLoop, ca
   }
 }
 
-fn run() -> [io, sql, time, net, crypto, llm, proc, fs_write, env] Nil {
+fn run() -> [io, sql, time, net, crypto, llm, proc, fs_write, env, approval] Nil {
   let model_name := match env.get("BOT_MODEL") {
     Some(v) => v,
     None => "glm-5.1",

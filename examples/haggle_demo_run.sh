@@ -17,5 +17,5 @@ curl -sf "${BASE}/health/readiness" >/dev/null 2>&1 || curl -sf "${BASE}/v1/mode
 
 cd "${REPO_DIR}"
 LITELLM_BASE_URL="${BASE}" LITELLM_MODEL="${MODEL}" \
-  lex run --allow-effects env,fs_write,io,llm,net,proc,sql,time \
+  lex run --allow-effects env,fs_write,io,llm,net,proc,sql,time,approval,stream \
   examples/haggle_demo.lex run

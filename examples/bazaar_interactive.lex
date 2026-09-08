@@ -53,7 +53,7 @@ fn bool_env(key :: Str, default_on :: Bool) -> [env] Bool {
   }
 }
 
-fn run() -> [net, io, sql, fs_write, sense, time, env, llm, proc] Unit {
+fn run() -> [net, io, sql, fs_write, sense, time, env, llm, proc, approval] Unit {
   let name := match env.get("CUSTOMER_NAME") {
     None => "Guest",
     Some(v) => if str.is_empty(v) { "Guest" } else { v },

@@ -21,7 +21,7 @@ curl -sf "${BASE}/health/readiness" >/dev/null 2>&1 || curl -sf "${BASE}/v1/mode
   exit 1
 }
 
-LEX_RUN="lex run --allow-effects concurrent,crypto,env,fs_read,fs_write,io,llm,net,proc,random,sql,time --allow-proc sh"
+LEX_RUN="lex run --allow-effects concurrent,crypto,env,fs_read,fs_write,io,llm,net,proc,random,sql,time,approval,stream --allow-proc sh"
 
 cleanup() { kill "$STALL_PID" 2>/dev/null || true; wait "$STALL_PID" 2>/dev/null || true; }
 trap cleanup EXIT INT TERM
@@ -46,5 +46,5 @@ done
 echo "[haggle] running buyer driver against ${STALL_URL} ..."
 cd "${REPO_DIR}"
 STALL_URL="${STALL_URL}" LITELLM_BASE_URL="${BASE}" LITELLM_MODEL="${MODEL}" \
-  lex run --allow-effects env,fs_write,io,llm,net,proc,sql,time \
+  lex run --allow-effects env,fs_write,io,llm,net,proc,sql,time,approval,stream \
   examples/haggle_a2a_demo.lex run
