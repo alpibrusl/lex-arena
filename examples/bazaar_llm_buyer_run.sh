@@ -22,7 +22,7 @@ fi
 
 echo "== shop: $MODEL buys under a capability-bounded budget =="
 BOT_MODEL="$MODEL" BAZAAR_TRAIL="$TRAIL" OPENCODE_API_KEY="$OPENCODE_API_KEY" \
-  $LEX run --allow-effects crypto,env,fs_write,io,llm,net,proc,sql,time,approval "$HERE/bazaar_llm_buyer.lex" run
+  $LEX run --allow-effects crypto,env,fs_write,io,llm,net,proc,sql,time,approval,stream "$HERE/bazaar_llm_buyer.lex" run
 
 echo
 echo "== verify: replay the trail, recompute compliance =="

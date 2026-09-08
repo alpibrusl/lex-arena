@@ -22,7 +22,7 @@ fi
 
 echo "== two-sided: $MODEL sellers price, an $MODEL buyer shops =="
 BOT_MODEL="$MODEL" BAZAAR_TRAIL="$TRAIL" OPENCODE_API_KEY="$OPENCODE_API_KEY" \
-  $LEX run --allow-effects crypto,env,fs_write,io,llm,net,proc,sql,time,approval "$HERE/bazaar_two_sided.lex" run \
+  $LEX run --allow-effects crypto,env,fs_write,io,llm,net,proc,sql,time,approval,stream "$HERE/bazaar_two_sided.lex" run \
   | grep -vE "seller LLM\]"
 
 echo

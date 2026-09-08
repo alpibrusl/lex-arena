@@ -22,7 +22,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 SIDECAR="$LEX_ROBOT_PKG/sidecar/sim_sidecar.lex"
-LEX_RUN="lex run --allow-effects concurrent,crypto,env,fs_read,fs_write,io,llm,net,proc,random,sql,time,approval --allow-proc sh"
+LEX_RUN="lex run --allow-effects concurrent,crypto,env,fs_read,fs_write,io,llm,net,proc,random,sql,time,approval,stream --allow-proc sh"
 
 start_sellers() {
   echo "── Starting 7 sidecars ──────────────────────────────────────"
@@ -64,7 +64,7 @@ stop_sellers() {
 
 run_customer() {
   echo "── Running rush hour demo ────────────────────────────────────"
-  lex run --allow-effects env,fs_write,io,llm,net,proc,sense,sql,time,approval \
+  lex run --allow-effects env,fs_write,io,llm,net,proc,sense,sql,time,approval,stream \
       "$REPO_DIR/examples/bazaar_rush.lex" run \
     | grep -v '^null$' || true
 }

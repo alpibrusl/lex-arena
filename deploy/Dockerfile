@@ -63,4 +63,4 @@ ENV LEX_ROBOT_SIDECAR_PORT=8900 \
 
 # The dashboard/referee: serves the SPA + the legacy game dashboards + hosts
 # every game's skills + SSE.
-CMD ["sh","-c","lex run --allow-effects concurrent,crypto,env,fs_read,fs_write,io,llm,net,proc,random,sql,time,approval --allow-proc sh /root/.lex/packages/lex-robot/sidecar/sim_sidecar.lex run"]
+CMD ["sh","-c","lex run --allow-effects concurrent,crypto,env,fs_read,fs_write,io,llm,net,proc,random,sql,time,approval,stream --allow-proc sh /root/.lex/packages/lex-robot/sidecar/sim_sidecar.lex run"]

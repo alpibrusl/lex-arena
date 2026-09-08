@@ -15,7 +15,7 @@ PORT="${NB_PORT:-8902}"
 MODELS="${NB_MODELS:-glm-5.1 kimi-k2.6 deepseek-v4-flash}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
 REF_POLICY="--allow-effects env,net,concurrent,io"
-BOT_POLICY="--allow-effects concurrent,env,fs_write,io,llm,net,proc,sql,time,approval"
+BOT_POLICY="--allow-effects concurrent,env,fs_write,io,llm,net,proc,sql,time,approval,stream"
 
 if [ -z "${OPENCODE_API_KEY:-}" ]; then
   echo "OPENCODE_API_KEY is required (e.g. \$(cat ~/.credentials/opencode/key))" >&2; exit 1
