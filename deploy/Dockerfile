@@ -18,7 +18,7 @@ RUN npm run build
 
 FROM ubuntu:24.04
 
-ARG LEX_VERSION=0.10.0
+ARG LEX_VERSION=0.10.18
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl git ca-certificates tar python3 \
