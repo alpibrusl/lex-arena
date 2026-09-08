@@ -20,7 +20,7 @@ REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 LEX_ROBOT_PKG="${LEX_ROBOT_PKG:-$HOME/.lex/packages/lex-robot}"
 DASH_PORT=8900
 DASH_URL="http://localhost:${DASH_PORT}"
-LEX_RUN="lex run --allow-effects concurrent,crypto,env,fs_read,fs_write,io,llm,net,proc,random,sense,sql,time"
+LEX_RUN="lex run --allow-effects concurrent,crypto,env,fs_read,fs_write,io,llm,net,proc,random,sense,sql,time,approval"
 
 cleanup() { echo "[notary] stopping..."; kill "$SRV_PID" 2>/dev/null || true; wait "$SRV_PID" 2>/dev/null || true; }
 trap cleanup EXIT INT TERM

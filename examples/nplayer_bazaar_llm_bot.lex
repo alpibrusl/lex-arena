@@ -249,7 +249,7 @@ fn mind_step(b :: Bot, line :: Str) -> (Bot, Str) {
   }
 }
 
-fn run() -> [env, net, concurrent, io, llm, proc] Nil {
+fn run() -> [env, net, concurrent, io, llm, proc, approval] Nil {
   let port := match env.get("NB_PORT") {
     Some(v) => match str.to_int(v) {
       Some(n) => n,
@@ -280,9 +280,9 @@ fn run() -> [env, net, concurrent, io, llm, proc] Nil {
       }
     })
     let __lex_discard_1 := io.print(str.join(["[llm-bot] dialing ", url, " model=", model_name], ""))
-    let res := net.dial_ws(url, "", fn () -> [concurrent, io, llm, net, proc] WsAction {
+    let res := net.dial_ws(url, "", fn () -> [concurrent, io, llm, net, proc, approval] WsAction {
       WsSend("join")
-    }, fn (m :: WsMessage) -> [concurrent, io, llm, net, proc] WsAction {
+    }, fn (m :: WsMessage) -> [concurrent, io, llm, net, proc, approval] WsAction {
       match m {
         WsText(s) => {
           let resp := conc.ask(mind, Line(s))

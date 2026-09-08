@@ -107,11 +107,11 @@ fn setup_one(url :: Str, name :: Str, secret :: Bytes) -> [net, io] Result[baz.S
 # ── Per-customer shopping run ──────────────────────────────────────────────────
 # goal             — free-form natural-language goal (e.g. "Find a Bowl ≤ 15 cr")
 # ask_human_enabled — whether the LLM may pause to ask the operator questions
-fn shop_customer(name :: Str, goal :: Str, stalls :: List[baz.StallInfo], policy :: consent.ConsentPolicy, log :: tlog.Log, root_id :: Str, now :: Int, provider :: prov.Provider, model :: prov.ModelRef, dash :: Str, ask_human_enabled :: Bool) -> [net, sql, time, llm, io, proc] Unit {
+fn shop_customer(name :: Str, goal :: Str, stalls :: List[baz.StallInfo], policy :: consent.ConsentPolicy, log :: tlog.Log, root_id :: Str, now :: Int, provider :: prov.Provider, model :: prov.ModelRef, dash :: Str, ask_human_enabled :: Bool) -> [net, sql, time, llm, io, proc, approval] Unit {
   let _cs := post_ui(dash, str.join(["{\"kind\":\"customer_start\",\"customer\":\"", name, "\",\"goal\":\"", json_esc(goal), "\"}"], ""))
   let _pb := io.print(str.join(["── ", name, ": ", goal, " ──────────────────────────"], ""))
   let init := { purchase: None, parent: root_id, used: [] }
-  let final_state := list.fold(stalls, init, fn (state :: baz.ShopState, stall :: baz.StallInfo) -> [net, sql, time, llm, io, proc] baz.ShopState {
+  let final_state := list.fold(stalls, init, fn (state :: baz.ShopState, stall :: baz.StallInfo) -> [net, sql, time, llm, io, proc, approval] baz.ShopState {
     match state.purchase {
       Some(_) => state,
       None => {
@@ -142,7 +142,7 @@ fn shop_customer(name :: Str, goal :: Str, stalls :: List[baz.StallInfo], policy
 }
 
 # ── Entry point ────────────────────────────────────────────────────────────────
-fn run() -> [net, io, sql, fs_write, sense, time, env, llm, proc] Unit {
+fn run() -> [net, io, sql, fs_write, sense, time, env, llm, proc, approval] Unit {
   let trail_path := "/tmp/lex-bazaar-rush.db"
   let dash := "http://localhost:8900"
 

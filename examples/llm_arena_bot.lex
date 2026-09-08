@@ -102,7 +102,7 @@ fn extract_text(steps :: List[d.Step]) -> Str {
 }
 
 # Ask the model for a move; validate it's a legal empty cell, else heuristic.
-fn llm_cell(b :: Str, side :: Str, model_name :: Str, key :: Str) -> [net, llm, io, proc] Int {
+fn llm_cell(b :: Str, side :: Str, model_name :: Str, key :: Str) -> [net, llm, io, proc, approval] Int {
   let sys := str.join([
     "You are a world-class Tic-Tac-Toe player. Play to win or draw, never to lose. ",
     "Reason briefly, then end your reply with a single final line in EXACTLY this form: MOVE=<cell>  ",
@@ -137,7 +137,7 @@ fn jstr(j :: jv.Json, key :: Str) -> Str { match jv.get_field(j, key) { Some(v) 
 fn jbool(j :: jv.Json, key :: Str) -> Bool { match jv.get_field(j, key) { Some(JBool(b)) => b, _ => false } }
 
 # ── poll-and-play loop ───────────────────────────────────────────────────────
-fn play_loop(server :: Str, side :: Str, model_name :: Str, key :: Str, token :: Str, n :: Int) -> [net, io, time, llm, proc] Unit {
+fn play_loop(server :: Str, side :: Str, model_name :: Str, key :: Str, token :: Str, n :: Int) -> [net, io, time, llm, proc, approval] Unit {
   if n <= 0 { io.print(str.concat("[", str.concat(side, "-bot] giving up (timeout)"))) } else {
     let st    := a2a(server, "game_state", "{}")
     let board := jstr(st, "board")
@@ -167,7 +167,7 @@ fn play_loop(server :: Str, side :: Str, model_name :: Str, key :: Str, token ::
   }
 }
 
-fn run() -> [env, net, io, time, llm, proc] Unit {
+fn run() -> [env, net, io, time, llm, proc, approval] Unit {
   let server := match env.get("TTT_SERVER")    { None => "http://localhost:8900", Some(u) => u }
   let side   := match env.get("SIDE")           { None => "O", Some(s) => if str.is_empty(s) { "O" } else { s } }
   let model  := match env.get("OPENCODE_MODEL") { None => "glm-5.2", Some(m) => if str.is_empty(m) { "glm-5.2" } else { m } }

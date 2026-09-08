@@ -18,7 +18,7 @@ ITEM="${1:-Bowl}"
 QTY="${2:-1}"
 BUDGET="${3:-50}"
 
-LEX_RUN="lex run --allow-effects concurrent,crypto,env,fs_read,fs_write,io,llm,net,proc,random,sql,time --allow-proc sh"
+LEX_RUN="lex run --allow-effects concurrent,crypto,env,fs_read,fs_write,io,llm,net,proc,random,sql,time,approval --allow-proc sh"
 SIDECAR="${LEX_ROBOT_PKG}/sidecar/sim_sidecar.lex"
 
 cleanup() {
@@ -118,7 +118,7 @@ echo "[auto_bazaar] dashboard: ${DASH_URL}  (answer the 'What should I shop for?
 echo ""
 SIDECAR_URL=${DASH_URL} \
 AUTO_BUDGET="${BUDGET}" \
-  lex run --allow-effects env,fs_write,io,llm,net,proc,sense,sql,time \
+  lex run --allow-effects env,fs_write,io,llm,net,proc,sense,sql,time,approval \
   "${REPO_DIR}/examples/auto_bazaar.lex" run
 
 echo ""

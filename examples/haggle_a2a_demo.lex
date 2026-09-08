@@ -44,7 +44,7 @@ fn resp_decision(body :: Str) -> Str {
   if str.contains(lo, "\"walk\"")   { "walk" }   else { "counter" }}
 }
 
-fn loop(provider :: prov.Provider, model :: prov.ModelRef, url :: Str, item :: Str, base :: Int, budget :: Int, max_rounds :: Int, ask :: Int, last_offer :: Int, round :: Int) -> [net, llm, io, proc] h.Deal {
+fn loop(provider :: prov.Provider, model :: prov.ModelRef, url :: Str, item :: Str, base :: Int, budget :: Int, max_rounds :: Int, ask :: Int, last_offer :: Int, round :: Int) -> [net, llm, io, proc, approval] h.Deal {
   if round > max_rounds {
     { closed: false, price: 0, rounds: round - 1, reason: "impasse — no deal after the round cap" }
   } else {
@@ -87,7 +87,7 @@ fn loop(provider :: prov.Provider, model :: prov.ModelRef, url :: Str, item :: S
   }
 }
 
-fn run() -> [env, io, llm, net, proc] Int {
+fn run() -> [env, io, llm, net, proc, approval] Int {
   let url    := match env.get("STALL_URL") { None => "http://localhost:8901", Some(v) => if str.is_empty(v) { "http://localhost:8901" } else { v } }
   let model_name := match env.get("LITELLM_MODEL") { None => "qwen3-coder:30b", Some(v) => if str.is_empty(v) { "qwen3-coder:30b" } else { v } }
   let provider := providers.litellm()

@@ -190,7 +190,7 @@ fn parse_pick(text :: Str) -> Int {
 }
 
 # ── the shopping loop (the agent's turns) ────────────────────────────────────
-fn shop(pol :: models.Policy, log :: trail.Log, agent :: llm_agent.AgentLoop, cat :: List[Stall], owned :: List[Bool], spent :: Int, history :: Str, turn :: Int, maxt :: Int) -> [io, sql, time, net, crypto, llm, proc, fs_write] Nil {
+fn shop(pol :: models.Policy, log :: trail.Log, agent :: llm_agent.AgentLoop, cat :: List[Stall], owned :: List[Bool], spent :: Int, history :: Str, turn :: Int, maxt :: Int) -> [io, sql, time, net, crypto, llm, proc, fs_write, approval] Nil {
   if turn >= maxt {
     io.print("  (turn limit reached)")
   } else {
@@ -232,7 +232,7 @@ fn short_reason(r :: Str) -> Str {
   }
 }
 
-fn run() -> [io, sql, time, net, crypto, llm, proc, fs_write, env] Nil {
+fn run() -> [io, sql, time, net, crypto, llm, proc, fs_write, env, approval] Nil {
   let model_name := match env.get("BOT_MODEL") {
     Some(v) => v,
     None => "glm-5.1",
