@@ -269,7 +269,7 @@ fn run() -> [env, net, concurrent, io, llm, proc, approval] Nil {
     io.print("[llm-bot] OPENCODE_API_KEY is required")
   } else {
     let url := str.join(["ws://127.0.0.1:", int.to_str(port)], "")
-    let provider := oai.make_provider({ api_key: key, base_url: opencode_zen_url() })
+    let provider := oai.make_provider(oai.config_at(key, opencode_zen_url()))
     let model := prov.make_model_ref("opencode-go", model_name)
     let opts := { temperature: Some(0.3), top_p: None, max_steps: Some(1), max_tokens: Some(2500) }
     let system := str.join(["You are a sharp, competitive player in an N-player Bazaar draft. ", "Players take turns claiming items from a shared pool under a fixed budget; ", "the highest total worth wins. On your turn you draft exactly one item you ", "can afford. Think about value for money. Always answer with EXACTLY one ", "line: PICK:<index> or PICK:PASS, nothing else."], "")

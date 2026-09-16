@@ -269,7 +269,7 @@ fn run() -> [io, sql, time, net, crypto, llm, proc, fs_write, env, approval] Nil
           n + 1
         })
         let _sh := io.print("\n— buyer shops —")
-        let provider := oai.make_provider({ api_key: key, base_url: opencode_zen_url() })
+        let provider := oai.make_provider(oai.config_at(key, opencode_zen_url()))
         let model := prov.make_model_ref("opencode-go", model_name)
         let opts := { temperature: Some(0.3), top_p: None, max_steps: Some(1), max_tokens: Some(2500) }
         let system := str.join(["You are a shrewd buyer agent in a bazaar. Prices are set by the sellers (some greedy). ", "Buy the best value for money within a capability-bounded budget token that may refuse some merchants or amounts. ", "Adapt when denied; stop when nothing is worth buying. Always answer EXACTLY: PICK:<index> or PICK:STOP."], "")
