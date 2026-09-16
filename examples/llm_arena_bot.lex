@@ -111,7 +111,7 @@ fn llm_cell(b :: Str, side :: Str, model_name :: Str, key :: Str) -> [net, llm, 
     "You are '", side, "'. Board cells (index:mark, '.'=empty): ", grid_str(b), ".\n",
     "It is your turn. Win if you can, otherwise block your opponent, otherwise take the strongest square. ",
     "End with: MOVE=<cell>"], "")
-  let provider := oai.make_provider({ api_key: key, base_url: opencode_zen_url() })
+  let provider := oai.make_provider(oai.config_at(key, opencode_zen_url()))
   let model    := prov.make_model_ref("opencode-go", model_name)
   # Generous max_tokens: GO models reason, and a low cap truncates the move.
   let opts     := { temperature: Some(0.3), top_p: None, max_steps: Some(1), max_tokens: Some(6000) }

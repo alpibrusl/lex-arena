@@ -264,7 +264,7 @@ fn run() -> [io, sql, time, net, crypto, llm, proc, fs_write, env, approval] Nil
           Err(e) => io.print(str.concat("budget.opened write failed: ", e)),
           Ok(_) => io.print(str.join(["budget: cap_total=", int.to_str(pol.cap_total), " per-tx=", int.to_str(pol.cap_per_transaction), " (the agent is NOT told which merchants are allowed)\n"], "")),
         }
-        let provider := oai.make_provider({ api_key: key, base_url: opencode_zen_url() })
+        let provider := oai.make_provider(oai.config_at(key, opencode_zen_url()))
         let model := prov.make_model_ref("opencode-go", model_name)
         let opts := { temperature: Some(0.3), top_p: None, max_steps: Some(1), max_tokens: Some(2500) }
         let system := str.join(["You are a shrewd buyer agent in a bazaar. You spend a capability-bounded budget token: ", "some merchants or amounts may be refused by the token regardless of your intent. Maximise total value within budget, ", "adapt when a purchase is denied, and stop when nothing worthwhile remains. Always answer with EXACTLY one line: PICK:<index> or PICK:STOP."], "")
